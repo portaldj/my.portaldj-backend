@@ -1,5 +1,12 @@
 <?php
 
+use App\Http\Controllers\Api\V1\Admin\CityController;
+use App\Http\Controllers\Api\V1\Admin\ClubController;
+use App\Http\Controllers\Api\V1\Admin\CountryController;
+use App\Http\Controllers\Api\V1\Admin\MusicGenreController;
+use App\Http\Controllers\Api\V1\Admin\ProfileTypeController;
+use App\Http\Controllers\Api\V1\Admin\SkillController;
+use App\Http\Controllers\Api\V1\Admin\UserController;
 use App\Http\Controllers\Api\V1\BookingController;
 use App\Http\Controllers\Api\V1\CommentController;
 use App\Http\Controllers\Api\V1\PostController;
@@ -40,6 +47,8 @@ Route::prefix('v1')->group(function () {
             Route::apiResource('music-genres', MusicGenreController::class);
             Route::apiResource('profile-types', ProfileTypeController::class);
             Route::apiResource('clubs', ClubController::class);
+            Route::apiResource('cities', CityController::class);
+            Route::apiResource('countries', CountryController::class);
         });
     });
 });
