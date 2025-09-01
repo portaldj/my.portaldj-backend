@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Booking extends Model
 {
+    const STATUS_PENDING = 'pending';
+    const STATUS_ACCEPTED = 'accepted';
+    const STATUS_REJECTEDD = 'rejected';
+
     /**
      * La solicitud de booking es hecha por un usuario (guest)
      * @return BelongsTo

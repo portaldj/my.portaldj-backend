@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Booking;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -17,7 +18,7 @@ return new class extends Migration
             $table->foreignId('dj_user_id')->constrained('users')->onDelete('cascade');
             $table->string('event_details');
             $table->dateTime('requested_date');
-            $table->enum('status', ['pending', 'accepted', 'rejected'])->default('pending');
+            $table->enum('status', [Booking::STATUS_PENDING, Booking::STATUS_ACCEPTED, Booking::STATUS_REJECTEDD])->default(Booking::STATUS_PENDING);
             $table->timestamps();
         });
     }
