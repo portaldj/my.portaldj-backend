@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UpdateUserProfileRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Services\UserProfileService;
@@ -13,6 +14,13 @@ class UserProfileController extends Controller
 {
     public function __construct(protected UserProfileService $userProfileService)
     {
+    }
+
+    public function me(Request $request): UserResource
+    {
+        $user = $request->user();
+        $user->load('city.country', 'roles', 'profileTypes', 'skills', 'clubs');
+        return new UserResource($user);
     }
 
     public function show(User $user): UserResource
