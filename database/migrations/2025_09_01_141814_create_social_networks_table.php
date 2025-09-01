@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('social_networks', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique(); // Facebook, Instagram, etc.
+            $table->string('name')->unique();
             $table->string('base_url')->nullable();
-            $table->string('icon')->nullable(); // e.g., 'fab fa-facebook'
+            $table->string('icon')->nullable();
             $table->timestamps();
         });
     }
