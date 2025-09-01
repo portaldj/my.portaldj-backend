@@ -9,21 +9,33 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class Post extends Model
 {
+    /**
+     * @return BelongsTo
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * @return HasMany
+     */
     public function comments(): HasMany
     {
         return $this->hasMany(Comment::class);
     }
 
+    /**
+     * @return MorphOne
+     */
     public function image(): MorphOne
     {
         return $this->morphOne(Image::class, 'imageable');
     }
 
+    /**
+     * @return BelongsTo
+     */
     public function schedule(): BelongsTo
     {
         return $this->belongsTo(Schedule::class);

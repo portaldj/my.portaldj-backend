@@ -13,7 +13,8 @@ class Image extends Model
     protected $guarded = [];
 
     /**
-     * Get the parent imageable model (post or user).
+     * Obtiene el Padre del imageable model (post or user).
+     * @return MorphTo
      */
     public function imageable(): MorphTo
     {
