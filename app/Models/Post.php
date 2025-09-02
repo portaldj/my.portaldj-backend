@@ -9,6 +9,12 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class Post extends Model
 {
+    protected $fillable = [
+        'user_id',
+        'content',
+        'schedule_id'
+    ];
+
     /**
      * @return BelongsTo
      */

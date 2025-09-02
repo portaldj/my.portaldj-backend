@@ -14,7 +14,7 @@ class PostService
      * @param UploadedFile|null $image
      * @return Post
      */
-    public function createPost(User $user, array $data, ?UploadedFile $image): Post
+    public function createPost(User $user, array $data, ?UploadedFile $image = null): Post
     {
         $post = $user->posts()->create($data);
 
