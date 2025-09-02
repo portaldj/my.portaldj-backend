@@ -8,7 +8,6 @@ use App\Http\Requests\UpdateCommentRequest;
 use App\Http\Resources\CommentResource;
 use App\Models\Comment;
 use App\Models\Post;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 class CommentController extends Controller

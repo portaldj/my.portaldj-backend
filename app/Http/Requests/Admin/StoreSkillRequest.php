@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreCityRequest extends FormRequest
+class StoreSkillRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -21,9 +21,6 @@ class StoreCityRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'name' => 'required|string|max:255',
-            'country_id' => 'required|integer|exists:countries,id',
-        ];
+        return ['name' => 'required|string|max:255|unique:skills,name'];
     }
 }

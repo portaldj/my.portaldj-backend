@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\Api\V1\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreMusicGenreRequest;
+use App\Http\Requests\Admin\UpdateMusicGenreRequest;
+use App\Http\Resources\MusicGenreResource;
 use App\Models\MusicGenre;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 class MusicGenreController extends Controller

@@ -3,12 +3,10 @@
 namespace App\Http\Controllers\Api\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreCountryRequest;
-use App\Http\Requests\UpdateCountryRequest;
+use App\Http\Requests\Admin\StoreCountryRequest;
+use App\Http\Requests\Admin\UpdateCountryRequest;
 use App\Http\Resources\CountryResource;
 use App\Models\Country;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 class CountryController extends Controller

@@ -3,9 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
-class UpdateProfileTypeRequest extends FormRequest
+class StorePostRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,6 +21,9 @@ class UpdateProfileTypeRequest extends FormRequest
      */
     public function rules(): array
     {
-        return ['name' => ['required','string','max:255', Rule::unique('profile_types')->ignore($this->profile_type->id)]];
+        return [
+            'content' => 'required|string|max:350',
+            'schedule_id' => 'nullable|integer|exists:schedules,id',
+        ];
     }
 }

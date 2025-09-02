@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
-class UpdateCityRequest extends FormRequest
+class StoreMusicGenreRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,9 +21,6 @@ class UpdateCityRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'name' => ['sometimes','required','string','max:255', Rule::unique('countries')->ignore($this->country->id)],
-            'code' => ['sometimes','required','string','size:2', Rule::unique('countries')->ignore($this->country->id)],
-        ];
+        return ['name' => 'required|string|max:255|unique:music_genres,name'];
     }
 }

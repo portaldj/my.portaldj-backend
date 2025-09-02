@@ -3,9 +3,13 @@
 use App\Http\Controllers\Api\V1\Admin\CityController;
 use App\Http\Controllers\Api\V1\Admin\ClubController;
 use App\Http\Controllers\Api\V1\Admin\CountryController;
+use App\Http\Controllers\Api\V1\Admin\EquipmentBrandController;
+use App\Http\Controllers\Api\V1\Admin\EquipmentModelController;
+use App\Http\Controllers\Api\V1\Admin\EquipmentTypeController;
 use App\Http\Controllers\Api\V1\Admin\MusicGenreController;
 use App\Http\Controllers\Api\V1\Admin\ProfileTypeController;
 use App\Http\Controllers\Api\V1\Admin\SkillController;
+use App\Http\Controllers\Api\V1\Admin\SocialNetworkController;
 use App\Http\Controllers\Api\V1\Admin\UserController;
 use App\Http\Controllers\Api\V1\BookingController;
 use App\Http\Controllers\Api\V1\CommentController;
@@ -38,7 +42,7 @@ Route::prefix('v1')->group(function () {
 
         Route::apiResource('schedules', ScheduleController::class);
 
-        Route::middleware('role:administrator')->prefix('admin')->name('admin.')->group(function () {
+        Route::middleware('role:'.\App\Models\Role::ROLE_ADMIN['name'])->prefix('admin')->name('admin.')->group(function () {
 
             Route::apiResource('users', UserController::class);
 
@@ -46,8 +50,15 @@ Route::prefix('v1')->group(function () {
             Route::apiResource('music-genres', MusicGenreController::class);
             Route::apiResource('profile-types', ProfileTypeController::class);
             Route::apiResource('clubs', ClubController::class);
+
             Route::apiResource('cities', CityController::class);
             Route::apiResource('countries', CountryController::class);
+
+            Route::apiResource('equipment-brands', EquipmentBrandController::class);
+            Route::apiResource('equipment-models', EquipmentModelController::class);
+            Route::apiResource('equipment-types', EquipmentTypeController::class);
+
+            Route::apiResource('social-networks', SocialNetworkController::class);
         });
     });
 });

@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class StoreMusicGenreRequest extends FormRequest
+class UpdateProfileTypeRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -21,6 +22,6 @@ class StoreMusicGenreRequest extends FormRequest
      */
     public function rules(): array
     {
-        return ['name' => 'required|string|max:255|unique:music_genres,name'];
+        return ['name' => ['required','string','max:255', Rule::unique('profile_types')->ignore($this->profile_type->id)]];
     }
 }

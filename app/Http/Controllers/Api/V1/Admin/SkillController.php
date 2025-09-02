@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api\V1\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreSkillRequest;
+use App\Http\Requests\Admin\UpdateSkillRequest;
 use App\Http\Resources\SkillResource;
 use App\Models\Skill;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;

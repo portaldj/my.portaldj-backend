@@ -25,4 +25,15 @@ class PostService
 
         return $post;
     }
+
+    /**
+     * @param Post $post
+     * @param array $data
+     * @return Post
+     */
+    public function updatePost(Post $post, array $data): Post
+    {
+        $post->update($data);
+        return $post;
+    }
 }

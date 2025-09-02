@@ -4,7 +4,7 @@ namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreEquipmentModelRequest extends FormRequest
+class StoreCountryRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -21,6 +21,9 @@ class StoreEquipmentModelRequest extends FormRequest
      */
     public function rules(): array
     {
-        return ['name' => 'required|string|max:255', 'equipment_brand_id' => 'required|integer|exists:equipment_brands,id'];
+        return [
+            'name' => 'required|string|max:255|unique:countries,name',
+            'code' => 'required|string|size:2|unique:countries,code',
+        ];
     }
 }

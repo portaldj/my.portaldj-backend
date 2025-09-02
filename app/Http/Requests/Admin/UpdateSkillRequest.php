@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class UpdateCountryRequest extends FormRequest
+class UpdateSkillRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -21,9 +22,6 @@ class UpdateCountryRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'name' => 'sometimes|required|string|max:255',
-            'country_id' => 'sometimes|required|integer|exists:countries,id',
-        ];
+        return ['name' => ['required','string','max:255', Rule::unique('skills')->ignore($this->skill->id)]];
     }
 }

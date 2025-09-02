@@ -11,7 +11,7 @@ class StoreEquipmentBrandRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,8 +21,6 @@ class StoreEquipmentBrandRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            //
-        ];
+        return ['name' => 'required|string|max:255|unique:equipment_brands,name', 'equipment_type_id' => 'required|integer|exists:equipment_types,id'];
     }
 }

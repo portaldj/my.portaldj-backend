@@ -11,7 +11,7 @@ class UpdateEquipmentModelRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,8 +21,6 @@ class UpdateEquipmentModelRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            //
-        ];
+        return ['name' => 'sometimes|required|string|max:255', 'equipment_brand_id' => 'sometimes|required|integer|exists:equipment_brands,id'];
     }
 }

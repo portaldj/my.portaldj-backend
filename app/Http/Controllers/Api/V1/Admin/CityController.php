@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreCityRequest;
-use App\Http\Requests\UpdateCityRequest;
+use App\Http\Requests\Admin\StoreCityRequest;
+use App\Http\Requests\Admin\UpdateCityRequest;
 use App\Http\Resources\CityResource;
 use App\Models\City;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;

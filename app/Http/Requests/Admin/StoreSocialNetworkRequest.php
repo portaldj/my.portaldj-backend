@@ -11,7 +11,7 @@ class StoreSocialNetworkRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,8 +21,6 @@ class StoreSocialNetworkRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            //
-        ];
+        return ['name' => 'required|string|max:255|unique:social_networks,name', 'base_url' => 'nullable|url', 'icon' => 'nullable|string|max:255'];
     }
 }

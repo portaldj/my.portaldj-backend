@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateSocialNetworkRequest extends FormRequest
 {
@@ -11,7 +12,7 @@ class UpdateSocialNetworkRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,8 +22,6 @@ class UpdateSocialNetworkRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            //
-        ];
+        return ['name' => ['required', 'string', 'max:255', Rule::unique('social_networks')->ignore($this->social_network->id)], 'base_url' => 'nullable|url', 'icon' => 'nullable|string|max:255'];
     }
 }

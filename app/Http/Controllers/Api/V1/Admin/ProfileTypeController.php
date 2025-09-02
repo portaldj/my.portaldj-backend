@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api\V1\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreProfileTypeRequest;
+use App\Http\Requests\Admin\UpdateProfileTypeRequest;
 use App\Http\Resources\ProfileTypeResource;
 use App\Models\ProfileType;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
@@ -31,7 +33,7 @@ class ProfileTypeController extends Controller
         return new ProfileTypeResource($profileType);
     }
 
-    public function destroy(ProfileType $profileType)
+    public function destroy(ProfileType $profileType): \Illuminate\Http\JsonResponse
     {
         $profileType->delete();
         return response()->json(null, ResponseAlias::HTTP_NO_CONTENT);

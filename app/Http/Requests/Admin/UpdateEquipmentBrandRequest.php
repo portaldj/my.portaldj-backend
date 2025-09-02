@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateEquipmentBrandRequest extends FormRequest
 {
@@ -11,7 +12,7 @@ class UpdateEquipmentBrandRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,8 +22,6 @@ class UpdateEquipmentBrandRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            //
-        ];
+        return ['name' => ['required', 'string', 'max:255', Rule::unique('equipment_brands')->ignore($this->equipment_brand->id)], 'equipment_type_id' => 'sometimes|required|integer|exists:equipment_types,id'];
     }
 }
