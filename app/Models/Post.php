@@ -3,47 +3,72 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class Post extends Model
 {
     protected $fillable = [
         'user_id',
         'content',
-        'schedule_id'
+        'image_path',
+        'location_tag_type',
+        'location_tag_id',
     ];
 
-    /**
-     * @return BelongsTo
-     */
-    public function user(): BelongsTo
+    public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * @return HasMany
-     */
-    public function comments(): HasMany
+    public function comments()
     {
         return $this->hasMany(Comment::class);
     }
 
-    /**
-     * @return MorphOne
-     */
-    public function image(): MorphOne
+    public function likes()
     {
-        return $this->morphOne(Image::class, 'imageable');
+        return $this->hasMany(Like::class);
     }
 
-    /**
-     * @return BelongsTo
-     */
-    public function schedule(): BelongsTo
+    public function taggedClubs()
     {
-        return $this->belongsTo(Schedule::class);
+        return $this->morphedByMany(Club::class, 'taggable', 'post_tags')->withTimestamps();
     }
+
+    public function taggedCities()
+    {
+        return $this->morphedByMany(City::class, 'taggable', 'post_tags')->withTimestamps();
+    }
+
+    public function taggedDjs()
+    {
+        return $this->morphedByMany(User::class, 'taggable', 'post_tags')->withTimestamps();
+    }
+
+    // Helper to get formatted tags for API/Frontend
+    public function getTagsAttribute()
+    {
+        $tags = collect();
+
+        if ($this->relationLoaded('taggedClubs')) {
+            foreach ($this->taggedClubs as $club) {
+                $tags->push(['id' => $club->id, 'name' => $club->name, 'type' => 'club']);
+            }
+        }
+
+        if ($this->relationLoaded('taggedCities')) {
+            foreach ($this->taggedCities as $city) {
+                $tags->push(['id' => $city->id, 'name' => $city->name, 'type' => 'city']);
+            }
+        }
+
+        if ($this->relationLoaded('taggedDjs')) {
+            foreach ($this->taggedDjs as $dj) {
+                $tags->push(['id' => $dj->id, 'name' => $dj->name, 'type' => 'user']);
+            }
+        }
+
+        return $tags;
+    }
+
+    protected $appends = ['tags'];
 }

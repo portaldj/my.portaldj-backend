@@ -3,16 +3,19 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class SocialNetwork extends Model
 {
-    /**
-     * Una red social puede ser usada por muchos usuarios.
-     * @return BelongsToMany
-     */
-    public function users(): BelongsToMany
+    protected $fillable = ['user_id', 'social_platform_id', 'url', 'order'];
+
+    public function user()
     {
-        return $this->belongsToMany(User::class)->withPivot('url')->withTimestamps();
+        return $this->belongsTo(User::class);
     }
+
+    public function platform()
+    {
+        return $this->belongsTo(SocialPlatform::class, 'social_platform_id');
+    }
+
 }
