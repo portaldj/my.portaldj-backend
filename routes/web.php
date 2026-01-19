@@ -20,6 +20,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/feed', [\App\Http\Controllers\FeedController::class, 'store'])->name('feed.store');
     Route::post('/feed/{post}/like', [\App\Http\Controllers\FeedController::class, 'like'])->name('feed.like');
     Route::post('/feed/{post}/comment', [\App\Http\Controllers\FeedController::class, 'comment'])->name('feed.comment');
+    Route::delete('/feed/posts/{post}', [\App\Http\Controllers\FeedController::class, 'destroy'])->name('feed.destroy');
+    Route::delete('/feed/comments/{comment}', [\App\Http\Controllers\FeedController::class, 'destroyComment'])->name('feed.comments.destroy');
 
     Route::get('/pool', function (App\Services\PoolService $poolService) {
         return Inertia::render('Pool/Index', [

@@ -48,4 +48,16 @@ class FeedController extends Controller
 
         return redirect()->back();
     }
+
+    public function destroy($postId): RedirectResponse
+    {
+        $this->feedService->deletePost(auth()->user(), $postId);
+        return redirect()->back()->with('success', 'Post deleted successfully.');
+    }
+
+    public function destroyComment($commentId): RedirectResponse
+    {
+        $this->feedService->deleteComment(auth()->user(), $commentId);
+        return redirect()->back()->with('success', 'Comment deleted successfully.');
+    }
 }

@@ -12,6 +12,7 @@ const props = defineProps({
 });
 
 const user = usePage().props.auth.user;
+const isAdmin = computed(() => user.roles.includes('Admin'));
 
 const postForm = useForm({
     content: '',
@@ -27,6 +28,7 @@ const submitPost = () => {
 };
 
 const allTagOptions = computed(() => {
+    // ... existing options logic is fine, standard computed
     const options = [];
     if (props.clubs) options.push(...props.clubs.map(c => ({ id: c.id, name: c.name, type: 'club' })));
     if (props.cities) options.push(...props.cities.map(c => ({ id: c.id, name: c.name, type: 'city' })));
@@ -56,6 +58,20 @@ const submitComment = (post) => {
             activeCommentInput.value[post.id] = false; 
         }
     });
+};
+
+const canDelete = (item) => {
+    return isAdmin.value || item.user.id === user.id;
+};
+
+const deletePost = (post) => {
+    if (!confirm('Are you sure you want to delete this post?')) return;
+    router.delete(route('feed.destroy', post.id), { preserveScroll: true });
+};
+
+const deleteComment = (comment) => {
+    if (!confirm('Are you sure you want to delete this comment?')) return;
+    router.delete(route('feed.comments.destroy', comment.id), { preserveScroll: true });
 };
 </script>
 
@@ -127,22 +143,35 @@ const submitComment = (post) => {
                 </div>
 
                 <!-- Posts List -->
-                <div v-for="post in posts.data" :key="post.id" class="bg-brand-surface p-6 rounded-lg shadow-lg border border-gray-700">
-                    <div class="flex items-center space-x-3 mb-4">
-                        <div class="h-10 w-10 rounded-full bg-gray-700 flex items-center justify-center text-gray-300">
-                            {{ post.user.name.charAt(0) }}
+                <div v-for="post in posts.data" :key="post.id" class="bg-brand-surface p-6 rounded-lg shadow-lg border border-gray-700 relative group">
+                    <!-- Post Header -->
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="h-10 w-10 rounded-full bg-gray-700 flex items-center justify-center text-gray-300">
+                                {{ post.user.name.charAt(0) }}
+                            </div>
+                            <div>
+                                <Link :href="route('profile.show', post.user.profile?.username || 'unknown')" class="text-white font-bold hover:underline">
+                                    {{ post.user.name }}
+                                </Link>
+                                <div class="text-gray-500 text-xs">{{ new Date(post.created_at).toLocaleString() }}</div>
+                            </div>
                         </div>
-                        <div>
-                            <Link :href="route('profile.show', post.user.profile?.username || 'unknown')" class="text-white font-bold hover:underline">
-                                {{ post.user.name }}
-                            </Link>
-                            <div class="text-gray-500 text-xs">{{ new Date(post.created_at).toLocaleString() }}</div>
-                        </div>
+                        
+                        <!-- Delete Post Button -->
+                        <button 
+                            v-if="canDelete(post)" 
+                            @click="deletePost(post)"
+                            class="text-gray-500 hover:text-red-500 transition p-1"
+                            title="Delete Post"
+                        >
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
                     </div>
                     
-                    <p class="text-gray-200 text-lg mb-4">
-                        {{ post.content }}
-                    </p>
+                    <p class="text-gray-200 text-lg mb-4 whitespace-pre-wrap">{{ post.content }}</p>
 
                     <!-- Attached Image -->
                     <div v-if="post.image_path" class="mb-4 rounded-lg overflow-hidden border border-gray-700">
@@ -158,7 +187,7 @@ const submitComment = (post) => {
                         </div>
                     </div>
 
-                    <!-- Legacy Tag Fallback (for old posts if migration failed or needed) -->
+                    <!-- Legacy Tag Fallback -->
                     <div v-else-if="post.tag_name" class="mb-4 text-sm text-brand-accent flex items-center">
                          <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                         <span class="ml-1 font-bold">{{ post.tag_name }}</span>
@@ -207,20 +236,34 @@ const submitComment = (post) => {
                         </div>
 
                         <!-- List -->
-                        <div v-for="comment in post.comments" :key="comment.id" class="flex space-x-3">
+                        <div v-for="comment in post.comments" :key="comment.id" class="flex space-x-3 group/comment">
                             <div class="flex-shrink-0 h-8 w-8 rounded-full bg-gray-700 flex items-center justify-center text-xs text-gray-300">
                                 {{ comment.user.name.charAt(0) }}
                             </div>
-                            <div class="flex-1 bg-gray-800 rounded-lg px-4 py-2">
+                            <div class="flex-1 bg-gray-800 rounded-lg px-4 py-2 relative">
                                 <div class="flex justify-between items-center">
                                     <span class="text-sm font-bold text-white">{{ comment.user.name }}</span>
-                                    <span class="text-xs text-gray-500">{{ new Date(comment.created_at).toLocaleDateString() }}</span>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs text-gray-500">{{ new Date(comment.created_at).toLocaleDateString() }}</span>
+                                        <!-- Delete Comment Button -->
+                                        <button 
+                                            v-if="canDelete(comment)" 
+                                            @click="deleteComment(comment)"
+                                            class="text-gray-600 hover:text-red-500 transition opacity-0 group-hover/comment:opacity-100"
+                                            title="Delete Comment"
+                                        >
+                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                        </button>
+                                    </div>
                                 </div>
                                 <p class="text-sm text-gray-300 mt-1">{{ comment.content }}</p>
                             </div>
                         </div>
                     </div>
                 </div>
+
 
                 <div v-if="posts.data.length === 0" class="text-center text-gray-500">
                     No posts yet. Be the first to share!

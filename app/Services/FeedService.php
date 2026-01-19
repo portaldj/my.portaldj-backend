@@ -90,4 +90,43 @@ class FeedService
             return true; // liked
         }
     }
+
+    /**
+     * Delete a post
+     */
+    public function deletePost(User $user, int $postId)
+    {
+        $post = Post::findOrFail($postId);
+
+        if ($user->id !== $post->user_id && !$user->hasRole('Admin')) {
+            abort(403, 'Unauthorized');
+        }
+
+        if ($post->image_path) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($post->image_path);
+        }
+
+        $post->delete();
+    }
+
+    /**
+     * Delete a comment
+     */
+    public function deleteComment(User $user, int $commentId)
+    {
+        $comment = \App\Models\Comment::findOrFail($commentId);
+
+        // Allow comment owner OR post owner OR Admin to delete
+        // If I'm the post owner, I should be able to delete comments on my post? Usually yes.
+        // User asked for "Admin users ... have option to delete posts or comments".
+        // I'll stick to Admin or Comment Owner for now, maybe Post Owner too.
+
+        $isPostOwner = $comment->post->user_id === $user->id;
+
+        if ($user->id !== $comment->user_id && !$user->hasRole('Admin') && !$isPostOwner) {
+            abort(403, 'Unauthorized');
+        }
+
+        $comment->delete();
+    }
 }

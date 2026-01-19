@@ -72,11 +72,19 @@ class AcademyController extends Controller
         return redirect()->back()->with('success', 'Chapter deleted.');
     }
 
-    public function destroy(Course $course)
+    public function destroy($id)
     {
+        $course = Course::with('chapters.exams')->findOrFail($id);
+
         // Delete thumbnail if exists
         if ($course->thumbnail_path) {
             Storage::disk('public')->delete($course->thumbnail_path);
+        }
+
+        // Manually delete children to ensuring everything cleans up even if cascade fails
+        foreach ($course->chapters as $chapter) {
+            $chapter->exams()->delete(); // Exams
+            $chapter->delete(); // Chapter
         }
 
         $course->delete();
