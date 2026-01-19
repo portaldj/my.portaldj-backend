@@ -58,6 +58,7 @@ class EquipmentController extends Controller
             'equipment_type_id' => 'required|exists:equipment_types,id',
             'name' => 'required|string|max:255',
             'is_verified' => 'boolean',
+            'documentation' => 'nullable|string',
         ]);
 
         $validated['slug'] = \Illuminate\Support\Str::slug($validated['name']);
@@ -110,6 +111,7 @@ class EquipmentController extends Controller
             'equipment_type_id' => 'required|exists:equipment_types,id',
             'name' => 'required|string|max:255',
             'is_verified' => 'boolean',
+            'documentation' => 'nullable|string',
         ]);
 
         $validated['slug'] = \Illuminate\Support\Str::slug($validated['name']);

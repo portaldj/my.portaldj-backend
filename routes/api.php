@@ -8,12 +8,12 @@ use App\Http\Controllers\Api\PoolController;
 use App\Http\Controllers\Api\AcademyController;
 use App\Http\Controllers\Api\EquipmentController;
 
+Route::get('equipment', [EquipmentController::class, 'index']);
+
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
-
-    Route::get('equipment', [EquipmentController::class, 'index']);
 
     // Profile
     Route::get('/profile', [ProfileController::class, 'show']);

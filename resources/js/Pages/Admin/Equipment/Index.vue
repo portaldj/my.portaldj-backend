@@ -25,7 +25,8 @@ const formModel = useForm({
     brand_id: '',
     equipment_type_id: '',
     name: '',
-    is_verified: false
+    is_verified: false,
+    documentation: ''
 });
 
 const addingBrand = ref(false);
@@ -70,6 +71,7 @@ const openModelModal = (model = null) => {
         formModel.equipment_type_id = model.equipment_type_id;
         formModel.name = model.name;
         formModel.is_verified = Boolean(model.is_verified);
+        formModel.documentation = model.documentation || '';
         isEditing.value = true;
     } else {
         formModel.id = null;
@@ -300,6 +302,18 @@ const deleteItem = (routeUrl) => {
                             <InputLabel for="model_name" value="Name" />
                             <TextInput id="model_name" v-model="formModel.name" class="mt-1 block w-full" placeholder="e.g. CDJ-3000" required />
                             <InputError class="mt-2" :message="formModel.errors.name" />
+                        </div>
+
+                        <div>
+                            <InputLabel for="model_documentation" value="Documentation (for AI Assistant)" />
+                            <textarea 
+                                id="model_documentation" 
+                                v-model="formModel.documentation" 
+                                class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                                rows="6"
+                                placeholder="Paste manual or technical details here..."
+                            ></textarea>
+                            <InputError class="mt-2" :message="formModel.errors.documentation" />
                         </div>
                         
                         <div class="flex items-center gap-2">

@@ -91,11 +91,16 @@ class ProfileController extends Controller
             'experiences.*.description' => ['nullable', 'string'],
             'experiences.*.start_date' => ['required_with:experiences', 'date'],
             'experiences.*.end_date' => ['nullable', 'date', 'after_or_equal:experiences.*.start_date'],
+
+            'openai_key' => ['nullable', 'string'],
+            'gemini_key' => ['nullable', 'string'],
         ]);
 
         $request->user()->fill([
             'name' => $validated['name'],
             'email' => $validated['email'],
+            'openai_key' => $validated['openai_key'] ?? $request->user()->openai_key,
+            'gemini_key' => $validated['gemini_key'] ?? $request->user()->gemini_key,
         ]);
 
         if ($request->user()->isDirty('email')) {

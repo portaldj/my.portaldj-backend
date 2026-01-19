@@ -62,6 +62,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // DJ Equipment
     Route::resource('dj-equipment', \App\Http\Controllers\DjEquipmentController::class)->only(['store', 'update', 'destroy']);
+
+    // AI Assistant
+    Route::get('/assistant', [\App\Http\Controllers\AssistantController::class, 'index'])->name('assistant.index');
+    Route::get('/assistant/{model}', [\App\Http\Controllers\AssistantController::class, 'show'])->name('assistant.chat');
+    Route::post('/assistant/{model}/chat', [\App\Http\Controllers\AssistantController::class, 'chat'])->name('assistant.sendMessage');
 });
 
 Route::get('/profile/{username}', [ProfileController::class, 'show'])->name('profile.show');

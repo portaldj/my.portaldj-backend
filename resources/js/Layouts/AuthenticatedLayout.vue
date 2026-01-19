@@ -41,6 +41,9 @@ const isAdmin = computed(() => roles.includes('Admin'));
                             <PremiumNavLink :href="route('academy') || route('academy.*')" :active="route().current('academy') || route().current('academy.*')">
                                 Academy
                             </PremiumNavLink>
+                            <PremiumNavLink :href="route('assistant.index')" :active="route().current('assistant.*')">
+                                AI Assistant
+                            </PremiumNavLink>
                             <PremiumNavLink v-if="isAdmin" :href="route('admin.dashboard')" :active="route().current('admin.*')" class="text-red-400 hover:text-red-300 border-red-500">
                                 Admin Panel
                             </PremiumNavLink>
@@ -121,6 +124,9 @@ const isAdmin = computed(() => roles.includes('Admin'));
                     </ResponsiveNavLink>
                     <ResponsiveNavLink :href="route('academy')" :active="route().current('academy') || route().current('academy.*')">
                         Academy
+                    </ResponsiveNavLink>
+                    <ResponsiveNavLink :href="route('assistant.index')" :active="route().current('assistant.*')">
+                        AI Assistant
                     </ResponsiveNavLink>
                      <ResponsiveNavLink v-if="isAdmin" :href="route('admin.dashboard')" :active="route().current('admin.*')" class="text-red-400">
                         Admin Panel

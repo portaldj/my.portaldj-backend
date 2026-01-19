@@ -25,6 +25,8 @@ class User extends Authenticatable
         'password',
         'banned_until',
         'ban_reason',
+        'openai_key',
+        'gemini_key',
     ];
 
     /**
@@ -48,6 +50,8 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'banned_until' => 'datetime',
             'password' => 'hashed',
+            'openai_key' => 'encrypted',
+            'gemini_key' => 'encrypted',
         ];
     }
 
