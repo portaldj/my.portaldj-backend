@@ -120,6 +120,23 @@ const formatDate = (dateString) => {
                             </div>
                          </div>
                     </div>
+                    
+                    <!-- Equipment -->
+                    <div class="bg-gray-800 p-6 rounded-lg border border-gray-700" v-if="user.equipment && user.equipment.length > 0">
+                        <h3 class="text-lg font-bold text-white mb-4">Setup / Gear</h3>
+                        <div class="space-y-3">
+                            <div v-for="item in user.equipment" :key="item.id" class="flex flex-col border-b border-gray-700 last:border-0 pb-3 last:pb-0">
+                                <div class="flex items-baseline justify-between">
+                                    <span class="text-gray-200 font-medium">
+                                        {{ item.brand?.name || item.equipment_model?.brand?.name }} 
+                                        {{ item.model_name || item.equipment_model?.name }}
+                                        <span v-if="item.equipment_model?.is_verified" class="ml-1 text-[10px] bg-blue-100/10 text-blue-300 px-1 rounded border border-blue-900">Verified</span>
+                                    </span>
+                                </div>
+                                <span class="text-xs text-brand-accent mt-1">{{ item.type?.name || item.equipment_model?.type?.name }}</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Right Column: Experience -->

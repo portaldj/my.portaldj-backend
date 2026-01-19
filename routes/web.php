@@ -59,6 +59,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // DJ Equipment
+    Route::resource('dj-equipment', \App\Http\Controllers\DjEquipmentController::class)->only(['store', 'update', 'destroy']);
 });
 
 Route::get('/profile/{username}', [ProfileController::class, 'show'])->name('profile.show');
@@ -102,6 +105,20 @@ Route::middleware(['auth', 'verified', 'role:Admin'])->prefix('admin')->name('ad
 
     Route::post('dj-types', [\App\Http\Controllers\Admin\DjTypeController::class, 'store'])->name('dj-types.store');
     Route::delete('dj-types/{djType}', [\App\Http\Controllers\Admin\DjTypeController::class, 'destroy'])->name('dj-types.destroy');
+
+    // Equipment Manager
+    Route::get('equipment', [\App\Http\Controllers\Admin\EquipmentController::class, 'index'])->name('equipment.index');
+    Route::post('brands', [\App\Http\Controllers\Admin\EquipmentController::class, 'storeBrand'])->name('brands.store');
+    Route::patch('brands/{brand}', [\App\Http\Controllers\Admin\EquipmentController::class, 'updateBrand'])->name('brands.update');
+    Route::delete('brands/{brand}', [\App\Http\Controllers\Admin\EquipmentController::class, 'destroyBrand'])->name('brands.destroy');
+
+    Route::post('equipment-types', [\App\Http\Controllers\Admin\EquipmentController::class, 'storeType'])->name('equipment-types.store');
+    Route::patch('equipment-types/{type}', [\App\Http\Controllers\Admin\EquipmentController::class, 'updateType'])->name('equipment-types.update');
+    Route::delete('equipment-types/{type}', [\App\Http\Controllers\Admin\EquipmentController::class, 'destroyType'])->name('equipment-types.destroy');
+
+    Route::post('equipment-models', [\App\Http\Controllers\Admin\EquipmentController::class, 'storeModel'])->name('equipment-models.store');
+    Route::patch('equipment-models/{model}', [\App\Http\Controllers\Admin\EquipmentController::class, 'updateModel'])->name('equipment-models.update');
+    Route::delete('equipment-models/{model}', [\App\Http\Controllers\Admin\EquipmentController::class, 'destroyModel'])->name('equipment-models.destroy');
 });
 
 require __DIR__ . '/auth.php';

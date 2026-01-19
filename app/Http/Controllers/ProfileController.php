@@ -31,6 +31,9 @@ class ProfileController extends Controller
                     'profile.djType',
                     'socialNetworks.platform',
                     'experiences',
+                    'equipment' => function ($query) {
+                        $query->where('is_public', true)->with(['brand', 'type', 'equipmentModel.brand', 'equipmentModel.type']);
+                    },
                     'genres',
                     'roles'
                 ])->firstOrFail();
@@ -53,7 +56,9 @@ class ProfileController extends Controller
             'djTypes' => \App\Models\DjType::all(),
             'socialPlatforms' => \App\Models\SocialPlatform::all(),
             'clubs' => \App\Models\Club::select('id', 'name')->orderBy('name')->get(),
-            'user' => $request->user()->load('profile', 'socialNetworks.platform', 'experiences'),
+            'brands' => \App\Models\Brand::select('id', 'name')->orderBy('name')->get(),
+            'equipmentTypes' => \App\Models\EquipmentType::select('id', 'name')->orderBy('name')->get(),
+            'user' => $request->user()->load('profile', 'socialNetworks.platform', 'experiences', 'equipment.brand', 'equipment.type', 'equipment.equipmentModel.brand', 'equipment.equipmentModel.type'),
         ]);
     }
 

@@ -90,4 +90,9 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(MusicGenre::class, 'genre_user', 'user_id', 'genre_id');
     }
+
+    public function equipment()
+    {
+        return $this->hasMany(DjEquipment::class);
+    }
 }
