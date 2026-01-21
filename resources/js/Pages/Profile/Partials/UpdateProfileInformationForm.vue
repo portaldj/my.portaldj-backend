@@ -27,6 +27,7 @@ import AutocompleteInput from '@/Components/AutocompleteInput.vue';
 const form = useForm({
     name: user.name,
     email: user.email,
+    locale: user.locale || 'en',
     username: user.profile?.username || '',
     phone: user.profile?.phone || '',
     biography: user.profile?.biography || '',
@@ -169,11 +170,11 @@ const submit = async () => {
     <section>
         <header>
             <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
-                Profile Information
+                {{ __('Profile Information') }}
             </h2>
 
             <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                Update your account's profile information and email address.
+                {{ __("Update your account's profile information and email address.") }}
             </p>
         </header>
 
@@ -182,7 +183,7 @@ const submit = async () => {
             class="mt-6 space-y-6"
         >
             <div>
-                <InputLabel for="name" value="Full Name" />
+                <InputLabel for="name" :value="__('Full Name')" />
                 <TextInput
                     id="name"
                     type="text"
@@ -196,7 +197,7 @@ const submit = async () => {
             </div>
 
             <div>
-                <InputLabel for="profile_image" value="Profile Photo" />
+                <InputLabel for="profile_image" :value="__('Profile Photo')" />
                 <input 
                     type="file" 
                     @input="form.profile_image = $event.target.files[0]"
@@ -206,7 +207,7 @@ const submit = async () => {
             </div>
 
             <div>
-                <InputLabel for="username" value="Username (DJ Name)" />
+                <InputLabel for="username" :value="__('Username (DJ Name)')" />
                 <TextInput
                     id="username"
                     type="text"
@@ -218,7 +219,7 @@ const submit = async () => {
             </div>
 
             <div>
-                <InputLabel for="email" value="Email" />
+                <InputLabel for="email" :value="__('Email')" />
                 <TextInput
                     id="email"
                     type="email"
@@ -230,9 +231,22 @@ const submit = async () => {
                 <InputError class="mt-2" :message="form.errors.email" />
             </div>
 
+            <div>
+                <InputLabel for="locale" :value="__('Language')" />
+                <select
+                    id="locale"
+                    v-model="form.locale"
+                    class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm"
+                >
+                    <option value="en">English</option>
+                    <option value="es">Español</option>
+                </select>
+                <InputError class="mt-2" :message="form.errors.locale" />
+            </div>
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                     <InputLabel for="phone" value="Phone" />
+                     <InputLabel for="phone" :value="__('Phone')" />
                     <TextInput
                         id="phone"
                         type="text"
@@ -242,13 +256,13 @@ const submit = async () => {
                     <InputError class="mt-2" :message="form.errors.phone" />
                 </div>
                 <div>
-                    <InputLabel for="dj_type_id" value="DJ Type" />
+                    <InputLabel for="dj_type_id" :value="__('DJ Type')" />
                     <select
                         id="dj_type_id"
                         v-model="form.dj_type_id"
                         class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm"
                     >
-                        <option value="" disabled>Select Type</option>
+                        <option value="" disabled>{{ __('Select Type') }}</option>
                         <option v-for="type in djTypes" :key="type.id" :value="type.id">{{ type.name }}</option>
                     </select>
                 </div>
@@ -256,32 +270,32 @@ const submit = async () => {
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <InputLabel for="country_id" value="Country" />
+                    <InputLabel for="country_id" :value="__('Country')" />
                     <select
                         id="country_id"
                         v-model="form.country_id"
                         class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm"
                     >
-                        <option value="" disabled>Select Country</option>
+                        <option value="" disabled>{{ __('Select Country') }}</option>
                         <option v-for="country in countries" :key="country.id" :value="country.id">{{ country.name }}</option>
                     </select>
                 </div>
                 <div>
-                    <InputLabel for="city_id" value="City" />
+                    <InputLabel for="city_id" :value="__('City')" />
                     <select
                         id="city_id"
                         v-model="form.city_id"
                         class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm"
                         :disabled="!form.country_id"
                     >
-                        <option value="" disabled>Select City</option>
+                        <option value="" disabled>{{ __('Select City') }}</option>
                         <option v-for="city in availableCities" :key="city.id" :value="city.id">{{ city.name }}</option>
                     </select>
                 </div>
             </div>
 
             <div>
-                 <InputLabel for="biography" value="Biography" />
+                 <InputLabel for="biography" :value="__('Biography')" />
                 <textarea
                     id="biography"
                     v-model="form.biography"
@@ -292,14 +306,14 @@ const submit = async () => {
 
             <div v-if="mustVerifyEmail && user.email_verified_at === null">
                 <p class="mt-2 text-sm text-gray-800 dark:text-gray-200">
-                    Your email address is unverified.
+                    {{ __('Your email address is unverified.') }}
                     <Link
                         :href="route('verification.send')"
                         method="post"
                         as="button"
                         class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:text-gray-400 dark:hover:text-gray-100 dark:focus:ring-offset-gray-800"
                     >
-                        Click here to re-send the verification email.
+                        {{ __('Click here to re-send the verification email.') }}
                     </Link>
                 </p>
 
@@ -307,13 +321,13 @@ const submit = async () => {
                     v-show="status === 'verification-link-sent'"
                     class="mt-2 text-sm font-medium text-green-600 dark:text-green-400"
                 >
-                    A new verification link has been sent to your email address.
+                    {{ __('A new verification link has been sent to your email address.') }}
                 </div>
             </div>
 
             <!-- Social Networks Section -->
             <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
-                <h3 class="text-md font-medium text-gray-900 dark:text-gray-100 mb-4">Social Networks</h3>
+                <h3 class="text-md font-medium text-gray-900 dark:text-gray-100 mb-4">{{ __('Social Networks') }}</h3>
                 
                 <div class="space-y-4">
                     <div 
@@ -338,7 +352,7 @@ const submit = async () => {
                                 class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm text-sm"
                                 required
                             >
-                                <option value="" disabled>Select Platform</option>
+                                <option value="" disabled>{{ __('Select Platform') }}</option>
                                 <option v-for="platform in socialPlatforms" :key="platform.id" :value="platform.id">
                                     {{ platform.name }}
                                 </option>
@@ -351,7 +365,7 @@ const submit = async () => {
                                 type="text"
                                 class="w-full text-sm"
                                 v-model="network.url"
-                                placeholder="URL or Username"
+                                :placeholder="__('URL or Username')"
                                 required
                             />
                         </div>
@@ -373,7 +387,7 @@ const submit = async () => {
                             class="flex items-center gap-2 px-4 py-2 bg-gray-800 dark:bg-gray-700 text-white rounded-md text-sm hover:bg-gray-700 dark:hover:bg-gray-600 transition"
                         >
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
-                            Add Social Link
+                            {{ __('Add Social Link') }}
                         </button>
                     </div>
                 </div>
@@ -381,7 +395,7 @@ const submit = async () => {
 
             <!-- Experiences Section -->
             <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
-                <h3 class="text-md font-medium text-gray-900 dark:text-gray-100 mb-4">Professional Experience</h3>
+                <h3 class="text-md font-medium text-gray-900 dark:text-gray-100 mb-4">{{ __('Professional Experience') }}</h3>
                 
                 <div class="space-y-6">
                     <div 
@@ -395,7 +409,7 @@ const submit = async () => {
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <InputLabel value="Job Title / Role" />
+                                <InputLabel :value="__('Job Title / Role')" />
                                 <TextInput
                                     type="text"
                                     class="mt-1 block w-full text-sm"
@@ -407,7 +421,7 @@ const submit = async () => {
                             </div>
 
                             <div>
-                                <InputLabel value="Place / Company" />
+                                <InputLabel :value="__('Place / Company')" />
                                 <AutocompleteInput
                                     v-model="experience.place"
                                     :items="clubs"
@@ -417,7 +431,7 @@ const submit = async () => {
                             </div>
 
                             <div>
-                                <InputLabel value="Start Date" />
+                                <InputLabel :value="__('Start Date')" />
                                 <TextInput
                                     type="date"
                                     class="mt-1 block w-full text-sm"
@@ -429,10 +443,10 @@ const submit = async () => {
 
                             <div>
                                 <div class="flex justify-between items-center">
-                                    <InputLabel value="End Date" />
+                                    <InputLabel :value="__('End Date')" />
                                     <label class="flex items-center text-xs text-gray-500 cursor-pointer">
                                         <input type="checkbox" v-model="experience.current" class="mr-1 rounded border-gray-300 text-brand-primary focus:ring-brand-primary">
-                                        Currently working here
+                                        {{ __('Currently working here') }}
                                     </label>
                                 </div>
                                 <TextInput
@@ -446,12 +460,12 @@ const submit = async () => {
                             </div>
 
                             <div class="md:col-span-2">
-                                <InputLabel value="Description" />
+                                <InputLabel :value="__('Description')" />
                                 <textarea
                                     v-model="experience.description"
                                     class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm text-sm"
                                     rows="3"
-                                    placeholder="Describe your responsibilities..."
+                                    :placeholder="__('Describe your responsibilities...')"
                                 ></textarea>
                                 <div v-if="form.errors[`experiences.${index}.description`]" class="text-red-500 text-xs mt-1">{{ form.errors[`experiences.${index}.description`] }}</div>
                             </div>
@@ -469,14 +483,14 @@ const submit = async () => {
                             class="flex items-center gap-2 px-4 py-2 bg-gray-800 dark:bg-gray-700 text-white rounded-md text-sm hover:bg-gray-700 dark:hover:bg-gray-600 transition"
                         >
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
-                            Add Experience
+                            {{ __('Add Experience') }}
                         </button>
                     </div>
                 </div>
             </div>
 
             <div class="flex items-center gap-4">
-                <PrimaryButton :disabled="form.processing">Save</PrimaryButton>
+                <PrimaryButton :disabled="form.processing">{{ __('Save') }}</PrimaryButton>
                 <!-- ... saved message ... -->
             </div>
         </form>

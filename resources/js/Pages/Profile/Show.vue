@@ -27,7 +27,7 @@ const formatDate = (dateString) => {
 
 <template>
     <Head>
-        <title>{{ user.name }} - DJ Profile</title>
+        <title>{{ user.name }} - {{ __('DJ Profile') }}</title>
         <meta name="description" :content="profile.biography ? profile.biography.substring(0, 160) : 'Check out ' + user.name + ' on Portal DJ.'" />
         
         <!-- Open Graph / Facebook -->
@@ -89,7 +89,7 @@ const formatDate = (dateString) => {
                 <!-- Actions -->
                 <div class="mt-6 md:mt-24" v-if="isOwnProfile">
                     <Link :href="route('profile.edit')" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded font-bold text-sm transition">
-                        Edit Profile
+                        {{ __('Edit Profile') }}
                     </Link>
                 </div>
             </div>
@@ -100,18 +100,18 @@ const formatDate = (dateString) => {
                 <div class="space-y-6">
                     <!-- Biography -->
                     <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
-                        <h3 class="text-lg font-bold text-white mb-4">About</h3>
+                        <h3 class="text-lg font-bold text-white mb-4">{{ __('About') }}</h3>
                         <p class="text-gray-400 text-sm whitespace-pre-line leading-relaxed">
-                            {{ profile.biography || 'No biography provided yet.' }}
+                            {{ profile.biography || __('No biography provided yet.') }}
                         </p>
                     </div>
 
                     <!-- Details -->
                     <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
-                         <h3 class="text-lg font-bold text-white mb-4">Details</h3>
+                         <h3 class="text-lg font-bold text-white mb-4">{{ __('Details') }}</h3>
                          <div class="space-y-4">
                             <div>
-                                <span class="block text-xs text-gray-500 uppercase font-bold">Genres</span>
+                                <span class="block text-xs text-gray-500 uppercase font-bold">{{ __('Genres') }}</span>
                                 <div class="flex flex-wrap gap-2 mt-2">
                                     <span v-for="genre in user.genres" :key="genre.id" class="px-2 py-1 bg-gray-900 rounded text-xs text-brand-primary">
                                         {{ genre.name }}
@@ -124,14 +124,14 @@ const formatDate = (dateString) => {
                     
                     <!-- Equipment -->
                     <div class="bg-gray-800 p-6 rounded-lg border border-gray-700" v-if="user.equipment && user.equipment.length > 0">
-                        <h3 class="text-lg font-bold text-white mb-4">Setup / Gear</h3>
+                        <h3 class="text-lg font-bold text-white mb-4">{{ __('Setup / Gear') }}</h3>
                         <div class="space-y-3">
                             <div v-for="item in user.equipment" :key="item.id" class="flex flex-col border-b border-gray-700 last:border-0 pb-3 last:pb-0">
                                 <div class="flex items-baseline justify-between">
                                     <span class="text-gray-200 font-medium">
                                         {{ item.brand?.name || item.equipment_model?.brand?.name }} 
                                         {{ item.model_name || item.equipment_model?.name }}
-                                        <span v-if="item.equipment_model?.is_verified" class="ml-1 text-[10px] bg-blue-100/10 text-blue-300 px-1 rounded border border-blue-900">Verified</span>
+                                        <span v-if="item.equipment_model?.is_verified" class="ml-1 text-[10px] bg-blue-100/10 text-blue-300 px-1 rounded border border-blue-900">{{ __('Verified') }}</span>
                                     </span>
                                 </div>
                                 <span class="text-xs text-brand-accent mt-1">{{ item.type?.name || item.equipment_model?.type?.name }}</span>
@@ -143,7 +143,7 @@ const formatDate = (dateString) => {
                 <!-- Right Column: Experience -->
                 <div class="lg:col-span-2 space-y-6">
                     <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
-                        <h3 class="text-lg font-bold text-white mb-6">Experience</h3>
+                        <h3 class="text-lg font-bold text-white mb-6">{{ __('Experience') }}</h3>
                         
                         <div v-if="user.experiences && user.experiences.length > 0" class="space-y-8 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-300 before:to-transparent">
                              <div v-for="exp in user.experiences" :key="exp.id" class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
@@ -157,7 +157,7 @@ const formatDate = (dateString) => {
                                 <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-gray-900 p-4 rounded border border-slate-700 shadow">
                                     <div class="flex items-center justify-between space-x-2 mb-1">
                                         <div class="font-bold text-slate-200">{{ exp.title }}</div>
-                                        <time class="font-caveat font-medium text-brand-accent">{{ formatDate(exp.start_date) }} - {{ exp.end_date ? formatDate(exp.end_date) : 'Present' }}</time>
+                                        <time class="font-caveat font-medium text-brand-accent">{{ formatDate(exp.start_date) }} - {{ exp.end_date ? formatDate(exp.end_date) : __('Present') }}</time>
                                     </div>
                                     <div class="text-slate-400 text-sm mb-2">{{ exp.place }}</div>
                                     <div class="text-slate-500 text-sm">{{ exp.description }}</div>
@@ -166,7 +166,7 @@ const formatDate = (dateString) => {
                         </div>
 
                         <div v-else class="text-gray-500 text-center py-4">
-                            No experience listed.
+                            {{ __('No experience listed.') }}
                         </div>
                     </div>
                 </div>

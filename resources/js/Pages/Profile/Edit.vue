@@ -25,12 +25,12 @@ defineProps({
 </script>
 
 <template>
-    <Head title="Profile" />
+    <Head :title="__('Profile')" />
 
     <AuthenticatedLayout>
         <template #header>
             <h2 class="text-xl font-semibold leading-tight text-white">
-                Profile
+                {{ __('Profile') }}
             </h2>
         </template>
 

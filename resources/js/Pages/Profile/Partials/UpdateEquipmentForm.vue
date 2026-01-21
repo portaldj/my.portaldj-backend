@@ -68,9 +68,9 @@ const deleteItem = (item) => {
 <template>
     <section>
         <header>
-            <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">My Equipment</h2>
+            <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">{{ __('My Equipment') }}</h2>
             <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                Share your setup with the world or keep track of your gear.
+                {{ __('Share your setup with the world or keep track of your gear.') }}
             </p>
         </header>
 
@@ -97,7 +97,7 @@ const deleteItem = (item) => {
                         :class="item.is_public ? 'text-green-600 hover:text-green-500 bg-green-100 dark:bg-green-900/30' : 'text-yellow-600 hover:text-yellow-500 bg-yellow-100 dark:bg-yellow-900/30'"
                         title="Toggle Visibility"
                     >
-                        {{ item.is_public ? 'Public' : 'Private' }}
+                        {{ item.is_public ? __('Public') : __('Private') }}
                     </button>
                     
                     <button 
@@ -114,30 +114,30 @@ const deleteItem = (item) => {
         </div>
 
         <div v-else class="mt-6 text-gray-500 text-sm italic">
-            No equipment listed yet.
+            {{ __('No equipment listed yet.') }}
         </div>
 
         <!-- Add Button -->
         <div class="mt-6">
             <SecondaryButton @click="adding = !adding" v-if="!adding">
-                + Add Equipment
+                {{ __('+ Add Equipment') }}
             </SecondaryButton>
         </div>
 
         <!-- Add Form -->
         <div v-if="adding" class="mt-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800">
-            <h3 class="text-sm font-bold text-gray-700 dark:text-gray-300 mb-4">Add New Item</h3>
+            <h3 class="text-sm font-bold text-gray-700 dark:text-gray-300 mb-4">{{ __('Add New Item') }}</h3>
             <form @submit.prevent="addEquipment" class="space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <InputLabel for="brand" value="Brand" />
+                        <InputLabel for="brand" :value="__('Brand')" />
                         <select 
                             id="brand" 
                             v-model="form.brand_id"
                             class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm"
                             required
                         >
-                            <option value="">Select Brand</option>
+                            <option value="">{{ __('Select Brand') }}</option>
                             <option v-for="brand in brands" :key="brand.id" :value="brand.id">
                                 {{ brand.name }}
                             </option>
@@ -146,14 +146,14 @@ const deleteItem = (item) => {
                     </div>
 
                     <div>
-                        <InputLabel for="type" value="Type" />
+                        <InputLabel for="type" :value="__('Type')" />
                         <select 
                             id="type" 
                             v-model="form.equipment_type_id"
                             class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm"
                             required
                         >
-                            <option value="">Select Type</option>
+                            <option value="">{{ __('Select Type') }}</option>
                             <option v-for="type in equipmentTypes" :key="type.id" :value="type.id">
                                 {{ type.name }}
                             </option>
@@ -163,7 +163,7 @@ const deleteItem = (item) => {
                 </div>
 
                 <div>
-                    <InputLabel for="model" value="Model Name" />
+                    <InputLabel for="model" :value="__('Model Name')" />
                     <EquipmentAutocomplete
                         id="model"
                         v-model="form.model_name"
@@ -174,7 +174,7 @@ const deleteItem = (item) => {
                     />
                     <InputError class="mt-2" :message="form.errors.model_name" />
                     <p class="text-xs text-gray-500 mt-1" v-if="!form.equipment_model_id && form.model_name.length > 2">
-                        This will be added as a custom/unverified model.
+                        {{ __('This will be added as a custom/unverified model.') }}
                     </p>
                 </div>
 
@@ -185,12 +185,12 @@ const deleteItem = (item) => {
                         v-model="form.is_public"
                         class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900 dark:focus:ring-indigo-600"
                     >
-                    <label for="is_public" class="text-sm text-gray-700 dark:text-gray-300">Show on public profile</label>
+                    <label for="is_public" class="text-sm text-gray-700 dark:text-gray-300">{{ __('Show on public profile') }}</label>
                 </div>
 
                 <div class="flex items-center gap-4">
-                    <PrimaryButton :disabled="form.processing">Save</PrimaryButton>
-                    <button type="button" @click="adding = false" class="text-sm text-gray-500 underline hover:text-gray-700">Cancel</button>
+                    <PrimaryButton :disabled="form.processing">{{ __('Save') }}</PrimaryButton>
+                    <button type="button" @click="adding = false" class="text-sm text-gray-500 underline hover:text-gray-700">{{ __('Cancel') }}</button>
                 </div>
             </form>
         </div>

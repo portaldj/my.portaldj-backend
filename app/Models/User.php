@@ -28,6 +28,7 @@ class User extends Authenticatable
         'openai_key',
         'gemini_key',
         'last_trial_at',
+        'locale',
     ];
 
     /**

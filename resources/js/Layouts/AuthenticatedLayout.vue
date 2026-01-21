@@ -35,22 +35,22 @@ const isAdmin = computed(() => roles.value.includes('Admin'));
                         <!-- Navigation Links -->
                         <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                             <PremiumNavLink :href="route('dashboard')" :active="route().current('dashboard') || route().current('feed.*')">
-                                Global Feed
+                                {{ __('Global Feed') }}
                             </PremiumNavLink>
                             <PremiumNavLink :href="route('pool')" :active="route().current('pool')">
-                                Music Pool
+                                {{ __('Music Pool') }}
                             </PremiumNavLink>
                             <PremiumNavLink :href="route('academy') || route('academy.*')" :active="route().current('academy') || route().current('academy.*')">
-                                Academy
+                                {{ __('Academy') }}
                             </PremiumNavLink>
                             <NavLink :href="route('assistant.index')" :active="route().current('assistant.*')">
-                                AI Assistant
+                                {{ __('AI Assistant') }}
                             </NavLink>
                             <NavLink v-if="$page.props.auth.user && !$page.props.auth.user.is_pro" :href="route('subscription.index')" :active="route().current('subscription.*')" class="text-yellow-500 font-bold">
-                                Upgrade to PRO
+                                {{ __('Upgrade to PRO') }}
                             </NavLink>
                             <PremiumNavLink v-if="isAdmin" :href="route('admin.dashboard')" :active="route().current('admin.*')" class="text-red-400 hover:text-red-300 border-red-500">
-                                Admin Panel
+                                {{ __('Admin Panel') }}
                             </PremiumNavLink>
                         </div>
                     </div>
@@ -73,13 +73,13 @@ const isAdmin = computed(() => roles.value.includes('Admin'));
                                 <template #content>
                                     <div class="bg-brand-surface border border-gray-700 rounded-md">
                                         <DropdownLink :href="route('profile.show', user.profile?.username || user.id)" class="text-gray-300 hover:bg-brand-gray hover:text-brand-accent">
-                                            View Profile
+                                            {{ __('View Profile') }}
                                         </DropdownLink>
                                         <DropdownLink :href="route('profile.edit')" class="text-gray-300 hover:bg-brand-gray hover:text-brand-accent">
-                                            Edit Profile
+                                            {{ __('Edit Profile') }}
                                         </DropdownLink>
                                         <DropdownLink :href="route('logout')" method="post" as="button" class="text-gray-300 hover:bg-brand-gray hover:text-brand-secondary">
-                                            Log Out
+                                            {{ __('Log Out') }}
                                         </DropdownLink>
                                     </div>
                                 </template>
@@ -122,22 +122,22 @@ const isAdmin = computed(() => roles.value.includes('Admin'));
             <div :class="{ block: showingNavigationDropdown, hidden: !showingNavigationDropdown }" class="sm:hidden bg-brand-surface">
                 <div class="space-y-1 pb-3 pt-2">
                     <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">
-                        Dashboard
+                        {{ __('Dashboard') }}
                     </ResponsiveNavLink>
                     <ResponsiveNavLink :href="route('pool')" :active="route().current('pool')">
-                        Music Pool
+                        {{ __('Music Pool') }}
                     </ResponsiveNavLink>
                     <ResponsiveNavLink :href="route('academy')" :active="route().current('academy') || route().current('academy.*')">
-                        Academy
+                        {{ __('Academy') }}
                     </ResponsiveNavLink>
                     <ResponsiveNavLink :href="route('assistant.index')" :active="route().current('assistant.*')">
-                    AI Assistant
+                    {{ __('AI Assistant') }}
                 </ResponsiveNavLink>
                 <ResponsiveNavLink v-if="$page.props.auth.user && !$page.props.auth.user.is_pro" :href="route('subscription.index')" :active="route().current('subscription.*')" class="text-yellow-600 font-bold bg-yellow-50">
-                    Upgrade to PRO
+                    {{ __('Upgrade to PRO') }}
                 </ResponsiveNavLink>
                      <ResponsiveNavLink v-if="isAdmin" :href="route('admin.dashboard')" :active="route().current('admin.*')" class="text-red-400">
-                        Admin Panel
+                        {{ __('Admin Panel') }}
                     </ResponsiveNavLink>
                 </div>
 
@@ -148,13 +148,13 @@ const isAdmin = computed(() => roles.value.includes('Admin'));
                     </div>
 
                     <div class="mt-3 space-y-1">
-                        <ResponsiveNavLink :href="route('profile.edit')"> Profile </ResponsiveNavLink>
-                        <ResponsiveNavLink :href="route('logout')" method="post" as="button"> Log Out </ResponsiveNavLink>
+                        <ResponsiveNavLink :href="route('profile.edit')"> {{ __('Profile') }} </ResponsiveNavLink>
+                        <ResponsiveNavLink :href="route('logout')" method="post" as="button"> {{ __('Log Out') }} </ResponsiveNavLink>
                     </div>
                 </div>
                  <div class="border-t border-gray-700 pb-1 pt-4 p-4 space-y-2" v-else>
-                     <ResponsiveNavLink :href="route('login')"> Login </ResponsiveNavLink>
-                     <ResponsiveNavLink :href="route('register')"> Register </ResponsiveNavLink>
+                     <ResponsiveNavLink :href="route('login')"> {{ __('Log in') }} </ResponsiveNavLink>
+                     <ResponsiveNavLink :href="route('register')"> {{ __('Register') }} </ResponsiveNavLink>
                 </div>
             </div>
         </nav>
@@ -171,19 +171,19 @@ const isAdmin = computed(() => roles.value.includes('Admin'));
             <!-- Flash Messages -->
             <div v-if="$page.props.flash.success" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
                 <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
-                    <strong class="font-bold">Success! </strong>
+                    <strong class="font-bold">{{ __('Success!') }} </strong>
                     <span class="block sm:inline">{{ $page.props.flash.success }}</span>
                 </div>
             </div>
             <div v-if="$page.props.flash.error" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
                 <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-                    <strong class="font-bold">Error! </strong>
+                    <strong class="font-bold">{{ __('Error!') }} </strong>
                     <span class="block sm:inline">{{ $page.props.flash.error }}</span>
                 </div>
             </div>
             <div v-if="$page.props.flash.message" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
                 <div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative" role="alert">
-                    <strong class="font-bold">Info: </strong>
+                    <strong class="font-bold">{{ __('Info:') }} </strong>
                     <span class="block sm:inline">{{ $page.props.flash.message }}</span>
                 </div>
             </div>

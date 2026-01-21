@@ -16,17 +16,16 @@ const form = useForm({
 <template>
     <section>
         <header>
-            <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">AI API Keys</h2>
+            <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">{{ __('AI API Keys') }}</h2>
 
             <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                Provide your own API keys to query the AI Assistant without limits. Your keys are stored encrypted.
-                Leave empty to use the platform's default limited quota.
+                {{ __("Provide your own API keys to query the AI Assistant without limits. Your keys are stored encrypted. Leave empty to use the platform's default limited quota.") }}
             </p>
         </header>
 
         <form @submit.prevent="form.patch(route('profile.update'))" class="mt-6 space-y-6">
             <div>
-                <InputLabel for="openai_key" value="OpenAI API Key (sk-...)" />
+                <InputLabel for="openai_key" :value="__('OpenAI API Key (sk-...)')" />
 
                 <TextInput
                     id="openai_key"
@@ -40,7 +39,7 @@ const form = useForm({
             </div>
 
             <div>
-                <InputLabel for="gemini_key" value="Google Gemini API Key" />
+                <InputLabel for="gemini_key" :value="__('Google Gemini API Key')" />
 
                 <TextInput
                     id="gemini_key"
@@ -54,7 +53,7 @@ const form = useForm({
             </div>
 
             <div class="flex items-center gap-4">
-                <PrimaryButton :disabled="form.processing">Save Keys</PrimaryButton>
+                <PrimaryButton :disabled="form.processing">{{ __('Save Keys') }}</PrimaryButton>
 
                 <Transition
                     enter-active-class="transition ease-in-out"

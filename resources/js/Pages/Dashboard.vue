@@ -76,12 +76,12 @@ const deleteComment = (comment) => {
 </script>
 
 <template>
-    <Head title="Feed" />
+    <Head :title="__('Dashboard')" />
 
     <AuthenticatedLayout>
         <template #header>
             <h2 class="text-xl font-semibold leading-tight text-white">
-                Global Feed
+                {{ __('Global Feed') }}
             </h2>
         </template>
 

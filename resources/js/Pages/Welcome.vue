@@ -26,7 +26,7 @@ const availableCities = computed(() => {
 </script>
 
 <template>
-    <Head title="Welcome" />
+    <Head :title="__('Welcome')" />
     <div class="min-h-screen bg-brand-dark text-gray-100">
         <!-- Top Navigation (Login/Register) -->
         <nav v-if="canLogin" class="absolute top-0 right-0 p-6 z-50 flex justify-end space-x-4">
@@ -35,7 +35,7 @@ const availableCities = computed(() => {
                 :href="route('dashboard')"
                 class="font-semibold text-gray-200 hover:text-white"
             >
-                Dashboard
+                {{ __('Dashboard') }}
             </Link>
 
             <template v-else>
@@ -43,7 +43,7 @@ const availableCities = computed(() => {
                     :href="route('login')"
                     class="font-semibold text-gray-200 hover:text-white"
                 >
-                    Log in
+                     {{ __('Log in') }}
                 </Link>
 
                 <Link
@@ -51,7 +51,7 @@ const availableCities = computed(() => {
                     :href="route('register')"
                     class="font-semibold text-brand-primary hover:text-brand-secondary"
                 >
-                    Register
+                     {{ __('Register') }}
                 </Link>
             </template>
         </nav>
@@ -64,10 +64,10 @@ const availableCities = computed(() => {
              <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 flex flex-col items-center">
                  <div class="text-center w-full">
                      <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight text-white mb-6">
-                         Discover the World's Best <span class="bg-gradient-to-r from-brand-secondary to-brand-accent bg-clip-text text-transparent">DJs</span>
+                         {{ __('Discover the World\'s Best') }} <span class="bg-gradient-to-r from-brand-secondary to-brand-accent bg-clip-text text-transparent">DJs</span>
                      </h1>
                      <p class="mt-4 max-w-2xl mx-auto text-xl text-gray-400 mb-10">
-                         Connect with top talent, explore music genres, and find the perfect sound for your event.
+                         {{ __('Connect with top talent') }}
                      </p>
 
                      <!-- Search Box -->
@@ -76,13 +76,13 @@ const availableCities = computed(() => {
                              <input 
                                 v-model="form.search" 
                                 type="text" 
-                                placeholder="Search by name, username..." 
+                                :placeholder="__('Search by name')" 
                                 class="w-full bg-gray-800 border-gray-700 text-white rounded-lg focus:ring-brand-accent focus:border-brand-accent"
                              >
                          </div>
                          <div class="w-full md:w-48">
                              <select v-model="form.country_id" class="w-full bg-gray-800 border-gray-700 text-white rounded-lg focus:ring-brand-accent focus:border-brand-accent">
-                                 <option value="">All Countries</option>
+                                 <option value="">{{ __('All Countries') }}</option>
                                  <option v-for="country in filters.countries" :key="country.id" :value="country.id">
                                      {{ country.name }}
                                  </option>
@@ -90,14 +90,14 @@ const availableCities = computed(() => {
                          </div>
                          <div class="w-full md:w-48">
                              <select v-model="form.city_id" class="w-full bg-gray-800 border-gray-700 text-white rounded-lg focus:ring-brand-accent focus:border-brand-accent" :disabled="!form.country_id">
-                                 <option value="">All Cities</option>
+                                 <option value="">{{ __('All Cities') }}</option>
                                  <option v-for="city in availableCities" :key="city.id" :value="city.id">
                                      {{ city.name }}
                                  </option>
                              </select>
                          </div>
                          <button type="submit" class="w-full md:w-auto px-8 py-3 bg-brand-primary hover:bg-brand-secondary text-white font-bold rounded-lg transition shadow-lg shadow-brand-primary/20">
-                             Search
+                             {{ __('Search') }}
                          </button>
                      </form>
                  </div>
@@ -106,7 +106,7 @@ const availableCities = computed(() => {
 
         <!-- Latest DJs Grid -->
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-            <h2 class="text-3xl font-bold text-white mb-8 border-l-4 border-brand-accent pl-4">Latest Arrivals</h2>
+            <h2 class="text-3xl font-bold text-white mb-8 border-l-4 border-brand-accent pl-4">{{ __('Latest Arrivals') }}</h2>
             
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 <div v-for="dj in latestDJs" :key="dj.id" class="bg-brand-surface rounded-xl overflow-hidden border border-gray-800 hover:border-brand-accent transition group">
@@ -138,7 +138,7 @@ const availableCities = computed(() => {
             </div>
 
             <div v-if="latestDJs.length === 0" class="text-center py-20 text-gray-500">
-                No DJs found matching your search.
+                {{ __('No DJs found') }}
             </div>
         </div>
 

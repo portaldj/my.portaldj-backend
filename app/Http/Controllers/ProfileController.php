@@ -97,6 +97,7 @@ class ProfileController extends Controller
 
             'openai_key' => ['nullable', 'string'],
             'gemini_key' => ['nullable', 'string'],
+            'locale' => ['nullable', 'string', 'in:en,es'],
         ]);
 
         $request->user()->fill([
@@ -104,6 +105,7 @@ class ProfileController extends Controller
             'email' => $validated['email'],
             'openai_key' => $validated['openai_key'] ?? $request->user()->openai_key,
             'gemini_key' => $validated['gemini_key'] ?? $request->user()->gemini_key,
+            'locale' => $validated['locale'] ?? $request->user()->locale,
         ]);
 
         if ($request->user()->isDirty('email')) {
