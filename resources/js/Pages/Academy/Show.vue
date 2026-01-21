@@ -1,16 +1,34 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
 const props = defineProps({
     course: Object,
 });
 
-const currentChapter = ref(props.course.chapters[0] || null);
+// Auto-select first incomplete chapter or fallback to first
+const firstIncomplete = props.course.chapters.find(c => !c.is_completed);
+const currentChapter = ref(firstIncomplete || props.course.chapters[0] || null);
+const iframeLoaded = ref(false);
 
 const selectChapter = (chapter) => {
     currentChapter.value = chapter;
+    iframeLoaded.value = false;
+};
+
+const markComplete = () => {
+    if (!currentChapter.value) return;
+    router.post(route('academy.chapters.complete', currentChapter.value.id), {}, {
+        preserveScroll: true,
+        onSuccess: () => {
+            // Logic to move to next? 
+            // Props will update, is_completed will update.
+            // Maybe find next chapter and select it?
+            
+            // For now just keep current valid.
+        }
+    });
 };
 </script>
 
@@ -34,27 +52,40 @@ const selectChapter = (chapter) => {
                     
                     <!-- Main Content (Video Player & Description) -->
                     <div class="lg:col-span-2 space-y-6">
-                        <div class="bg-black rounded-lg overflow-hidden shadow-lg border border-gray-800 aspect-video flex items-center justify-center relative group">
+                        <div v-if="currentChapter?.video_url" class="bg-black rounded-lg overflow-hidden shadow-lg border border-gray-800 aspect-video flex items-center justify-center relative group">
                             <!-- Placeholder Video Player -->
-                            <div v-if="currentChapter?.video_url" class="w-full h-full bg-gray-900 flex items-center justify-center">
-                                <span class="text-gray-500">Video Player Loading...</span>
+                            <div class="w-full h-full bg-gray-900 flex items-center justify-center">
+                                <span v-if="!iframeLoaded" class="absolute text-gray-500">Video Player Loading...</span>
                                 <iframe 
                                     v-if="currentChapter.video_url.includes('youtube')"
                                     :src="currentChapter.video_url.replace('watch?v=', 'embed/')" 
-                                    class="w-full h-full" 
+                                    class="w-full h-full relative z-10" 
                                     frameborder="0" 
                                     allowfullscreen
+                                    @load="iframeLoaded = true"
                                 ></iframe>
-                                <div v-else class="text-center p-10">
+                                <div v-else class="text-center p-10 relative z-10">
                                     <p class="text-brand-accent mb-2">Video Source: {{ currentChapter.video_url }}</p>
                                     <p class="text-xs text-gray-500">(Real player integration requires generic HTML5 video or specific provider SDK)</p>
                                 </div>
                             </div>
-                            <div v-else class="text-gray-500">Select a chapter to start learning.</div>
                         </div>
 
                         <div class="bg-brand-surface p-6 rounded-lg shadow border border-gray-700">
-                            <h3 class="text-2xl font-bold text-white mb-2">{{ currentChapter?.title || course.title }}</h3>
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="text-2xl font-bold text-white">{{ currentChapter?.title || course.title }}</h3>
+                                <button 
+                                    v-if="currentChapter && !currentChapter.is_completed" 
+                                    @click="markComplete" 
+                                    class="text-xs bg-brand-primary hover:bg-violet-600 text-white px-3 py-1 rounded transition"
+                                >
+                                    Mark as Complete
+                                </button>
+                                <span v-else-if="currentChapter?.is_completed" class="text-xs bg-green-600 text-white px-3 py-1 rounded flex items-center">
+                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    Completed
+                                </span>
+                            </div>
                             <p class="text-gray-300">{{ currentChapter?.content || course.description }}</p>
                         </div>
                     </div>
@@ -62,10 +93,13 @@ const selectChapter = (chapter) => {
                     <!-- Sidebar (Chapter List) -->
                     <div class="space-y-6">
                         <div class="bg-brand-surface rounded-lg shadow border border-gray-700 overflow-hidden">
-                            <div class="p-4 bg-gray-800 border-b border-gray-700">
+                            <div class="p-4 bg-gray-800 border-b border-gray-700 flex justify-between items-center">
                                 <h3 class="font-bold text-gray-200">Course Content</h3>
+                                <span class="text-xs text-gray-400">
+                                    {{ course.chapters.filter(c => c.is_completed).length }}/{{ course.chapters.length }} Completed
+                                </span>
                             </div>
-                            <ul class="divide-y divide-gray-700">
+                            <ul class="divide-y divide-gray-700 max-h-[600px] overflow-y-auto">
                                 <li 
                                     v-for="chapter in course.chapters" 
                                     :key="chapter.id" 
@@ -73,20 +107,26 @@ const selectChapter = (chapter) => {
                                     class="p-4 cursor-pointer transition hover:bg-gray-800 flex items-center justify-between"
                                     :class="{'bg-brand-gray/50 border-l-4 border-brand-accent': currentChapter?.id === chapter.id}"
                                 >
-                                    <div>
-                                        <div class="text-sm font-medium text-gray-200">{{ chapter.title }}</div>
-                                        <div class="text-xs text-gray-500">Video • 10m</div>
+                                    <div class="flex items-center space-x-3">
+                                        <!-- Status Icon -->
+                                        <div v-if="chapter.is_completed" class="text-green-500">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                        </div>
+                                        <div v-else class="text-gray-600">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                        </div>
+                                        
+                                        <div>
+                                            <div class="text-sm font-medium text-gray-200" :class="{'line-through text-gray-500': chapter.is_completed && currentChapter?.id !== chapter.id}">
+                                                {{ chapter.title }}
+                                            </div>
+                                            <!-- <div class="text-xs text-gray-500">Video</div> -->
+                                        </div>
                                     </div>
+                                    
                                     <div v-if="currentChapter?.id === chapter.id" class="text-brand-accent">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
-                                        </svg>
-                                    </div>
-                                    <div v-else-if="chapter.exam" class="text-gray-500">
-                                        <!-- Icon for exam -->
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
-                                            <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd" />
                                         </svg>
                                     </div>
                                 </li>

@@ -64,6 +64,7 @@ const formatDate = (dateString) => {
                 <!-- Basic Info -->
                 <div class="mt-4 md:mt-24 text-center md:text-left flex-1">
                     <h1 class="text-3xl font-bold text-white">{{ profile.username ? '@' + profile.username : user.name }}</h1>
+                    <p v-if="profile.username" class="text-lg text-gray-400 font-medium">{{ user.name }}</p>
                     <div class="flex flex-col md:flex-row items-center md:items-start text-gray-400 mt-2 space-y-1 md:space-y-0 md:space-x-4 text-sm">
                         <span v-if="profile.dj_type" class="flex items-center">
                             <svg class="w-4 h-4 mr-1 text-brand-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path></svg>

@@ -20,4 +20,15 @@ class TaxonomyController extends Controller
             'djTypes' => DjType::all(),
         ]);
     }
+    public function toggleCountry(Country $country)
+    {
+        $country->update(['is_active' => !$country->is_active]);
+        return back()->with('success', 'Country status updated.');
+    }
+
+    public function toggleCity(City $city)
+    {
+        $city->update(['is_active' => !$city->is_active]);
+        return back()->with('success', 'City status updated.');
+    }
 }

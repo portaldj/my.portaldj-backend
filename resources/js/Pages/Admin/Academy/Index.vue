@@ -12,6 +12,10 @@ const toggleCourse = (course) => {
     router.post(route('admin.academy.toggle', course.id));
 };
 
+const togglePro = (course) => {
+    router.post(route('admin.academy.togglePro', course.id));
+};
+
 const deleteCourse = (course) => {
     if (confirm('Are you sure you want to delete this course? This action cannot be undone.')) {
         router.delete(route('admin.academy.destroy', course.id));
@@ -48,10 +52,16 @@ const deleteCourse = (course) => {
                     <p class="text-gray-400 text-sm mb-4 line-clamp-3">{{ course.description }}</p>
                     <div class="mt-auto flex justify-between items-center gap-2">
                         <Link :href="route('admin.academy.show', course.id)" class="px-3 py-1 bg-gray-700 text-white text-sm rounded hover:bg-gray-600 transition">
-                            Manage
+                            Chapters
+                        </Link>
+                        <Link :href="route('admin.academy.edit', course.id)" class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-500 transition">
+                            Edit
                         </Link>
                         
-                        <div class="flex gap-2">
+                         <div class="flex gap-2">
+                             <button @click="togglePro(course)" class="text-sm px-2 py-1 rounded transition border border-gray-600" :class="course.is_pro ? 'text-yellow-400 bg-gray-700' : 'text-gray-400 hover:text-white'">
+                                {{ course.is_pro ? 'PRO Only' : 'Free' }}
+                             </button>
                              <button @click="toggleCourse(course)" class="text-sm px-2 py-1 rounded transition" :class="course.is_active ? 'text-yellow-400 hover:text-yellow-300' : 'text-green-400 hover:text-green-300'">
                                 {{ course.is_active ? 'Deactivate' : 'Activate' }}
                              </button>

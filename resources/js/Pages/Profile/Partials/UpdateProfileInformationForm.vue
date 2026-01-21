@@ -212,8 +212,7 @@ const submit = async () => {
                     type="text"
                     v-model="form.username"
                     required
-                    disabled
-                    class="mt-1 block w-full bg-gray-100 cursor-not-allowed text-gray-500"
+                    class="mt-1 block w-full"
                 />
                 <InputError class="mt-2" :message="form.errors.username" />
             </div>

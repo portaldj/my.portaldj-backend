@@ -1,6 +1,6 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head, usePage, useForm, router } from '@inertiajs/vue3';
+import { Head, Link, usePage, useForm, router } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import MultiSelect from '@/Components/MultiSelect.vue';
 
@@ -110,8 +110,8 @@ const deleteComment = (comment) => {
                                 <!-- Media & Tagging Tools -->
                                 <div class="mt-3 space-y-3">
                                     <div class="flex items-center gap-2">
-                                        <!-- Image Upload -->
-                                        <label class="cursor-pointer text-gray-400 hover:text-brand-accent p-2 rounded hover:bg-gray-800 transition relative group">
+                                        <!-- Image Upload (Hidden) -->
+                                        <label v-if="false" class="cursor-pointer text-gray-400 hover:text-brand-accent p-2 rounded hover:bg-gray-800 transition relative group">
                                             <input type="file" @input="postForm.image = $event.target.files[0]" class="hidden" accept="image/*">
                                             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -147,12 +147,16 @@ const deleteComment = (comment) => {
                     <!-- Post Header -->
                     <div class="flex justify-between items-start mb-4">
                         <div class="flex items-center space-x-3">
-                            <div class="h-10 w-10 rounded-full bg-gray-700 flex items-center justify-center text-gray-300">
-                                {{ post.user.name.charAt(0) }}
+                            <div class="h-10 w-10 rounded-full bg-gray-700 flex items-center justify-center text-gray-300 overflow-hidden">
+                                <img v-if="post.user.profile?.profile_image_path" :src="'/storage/' + post.user.profile.profile_image_path" class="w-full h-full object-cover" alt="Avatar">
+                                <span v-else>{{ post.user.name.charAt(0) }}</span>
                             </div>
                             <div>
                                 <Link :href="route('profile.show', post.user.profile?.username || 'unknown')" class="text-white font-bold hover:underline">
                                     {{ post.user.name }}
+                                </Link>
+                                <Link v-if="post.user.profile?.username" :href="route('profile.show', post.user.profile.username)" class="ml-2 text-brand-accent text-sm hover:underline">
+                                    @{{ post.user.profile.username }}
                                 </Link>
                                 <div class="text-gray-500 text-xs">{{ new Date(post.created_at).toLocaleString() }}</div>
                             </div>
@@ -237,8 +241,9 @@ const deleteComment = (comment) => {
 
                         <!-- List -->
                         <div v-for="comment in post.comments" :key="comment.id" class="flex space-x-3 group/comment">
-                            <div class="flex-shrink-0 h-8 w-8 rounded-full bg-gray-700 flex items-center justify-center text-xs text-gray-300">
-                                {{ comment.user.name.charAt(0) }}
+                            <div class="flex-shrink-0 h-8 w-8 rounded-full bg-gray-700 flex items-center justify-center text-xs text-gray-300 overflow-hidden">
+                                <img v-if="comment.user.profile?.profile_image_path" :src="'/storage/' + comment.user.profile.profile_image_path" class="w-full h-full object-cover" alt="Avatar">
+                                <span v-else>{{ comment.user.name.charAt(0) }}</span>
                             </div>
                             <div class="flex-1 bg-gray-800 rounded-lg px-4 py-2 relative">
                                 <div class="flex justify-between items-center">

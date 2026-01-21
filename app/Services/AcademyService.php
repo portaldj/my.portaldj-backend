@@ -12,12 +12,54 @@ class AcademyService
 {
     public function getAllCourses()
     {
-        return Course::where('is_active', true)->withCount('chapters')->get();
+        $userId = auth()->id();
+
+        return Course::where('is_active', true)
+            ->withCount('chapters')
+            ->withCount([
+                'chapters as user_completed_chapters_count' => function ($query) use ($userId) {
+                    $query->whereHas('users', function ($q) use ($userId) {
+                        $q->where('user_id', $userId);
+                    });
+                }
+            ])
+            ->get()
+            ->map(function ($course) {
+                $course->progress = $course->chapters_count > 0
+                    ? round(($course->user_completed_chapters_count / $course->chapters_count) * 100)
+                    : 0;
+                return $course;
+            });
     }
 
     public function getCourseDetails(int $courseId)
     {
-        return Course::where('is_active', true)->with(['chapters.exam'])->findOrFail($courseId);
+        $course = Course::where('is_active', true)
+            ->with([
+                'chapters' => function ($query) {
+                    $query->orderBy('order');
+                },
+                'chapters.exam'
+            ])
+            ->findOrFail($courseId);
+
+        // Append completed status to chapters
+        $completedChapterIds = auth()->user()->completedChapters()->where('course_id', $courseId)->pluck('chapter_id')->toArray();
+
+        foreach ($course->chapters as $chapter) {
+            $chapter->is_completed = in_array($chapter->id, $completedChapterIds);
+        }
+
+        return $course;
+    }
+
+    public function markChapterComplete(User $user, int $chapterId)
+    {
+        if (!$user->completedChapters()->where('chapter_id', $chapterId)->exists()) {
+            $user->completedChapters()->attach($chapterId, ['completed_at' => now()]);
+            return true;
+        }
+        return false;
     }
 
     public function submitExam(User $user, int $examId, array $answers)

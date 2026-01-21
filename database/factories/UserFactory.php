@@ -35,10 +35,19 @@ class UserFactory extends Factory
     /**
      * Indicate that the model's email address should be unverified.
      */
-    public function unverified(): static
+    /**
+     * Configure the model factory.
+     */
+    public function configure(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'email_verified_at' => null,
-        ]);
+        return $this->afterCreating(function (\App\Models\User $user) {
+            if (!$user->profile) {
+                $user->profile()->create([
+                    'first_name' => explode(' ', $user->name)[0],
+                    'last_name' => explode(' ', $user->name)[1] ?? '',
+                    'username' => \Illuminate\Support\Str::slug($user->name) . rand(100, 999),
+                ]);
+            }
+        });
     }
 }

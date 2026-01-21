@@ -2,33 +2,37 @@
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 
-defineProps({
+const props = defineProps({
+    song: Object,
     genres: Array,
 });
 
 const form = useForm({
-    track_name: '',
-    artist_name: '',
-    bpm: '',
-    key: '',
-    remix_type: '',
-    genre_id: '',
-    is_pro_only: false,
+    track_name: props.song.track_name,
+    artist_name: props.song.artist_name,
+    bpm: props.song.bpm,
+    key: props.song.key,
+    remix_type: props.song.remix_type,
+    genre_id: props.song.genre_id,
+    is_pro_only: !!props.song.is_pro_only,
     file: null,
-    download_url: '',
+    download_url: props.song.download_url || '',
+    _method: 'PUT',
 });
 
 const submit = () => {
-    form.post(route('admin.music.store'));
+    form.post(route('admin.music.update', props.song.id), {
+        forceFormData: true,
+    });
 };
 </script>
 
 <template>
-    <Head title="Upload Song" />
+    <Head title="Edit Song" />
 
     <AdminLayout>
         <template #header>
-            Upload New Song
+            Edit Song
         </template>
 
         <div class="max-w-2xl mx-auto bg-gray-800 p-8 rounded-lg shadow border border-gray-700">
@@ -41,13 +45,14 @@ const submit = () => {
                         @input="form.file = $event.target.files[0]"
                         class="mt-1 block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-brand-primary file:text-white hover:file:bg-violet-600"
                     />
+                    <div class="text-xs text-gray-500 mt-1">Leave empty to keep current file</div>
                     <div v-if="form.errors.file" class="text-red-500 text-xs mt-1">{{ form.errors.file }}</div>
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-gray-400">Alternative Download URL (Optional)</label>
                     <input v-model="form.download_url" type="url" placeholder="https://drive.google.com/..." class="mt-1 block w-full bg-gray-900 border-gray-700 rounded-md text-white shadow-sm focus:border-brand-primary focus:ring focus:ring-brand-primary focus:ring-opacity-50" />
-                    <div class="text-xs text-gray-500 mt-1">Direct link to default MP3/WAV if file upload is skipped/too large.</div>
+                    <div class="text-xs text-gray-500 mt-1">Direct link if you prefer external hosting (e.g. Drive, Dropbox).</div>
                     <div v-if="form.errors.download_url" class="text-red-500 text-xs mt-1">{{ form.errors.download_url }}</div>
                 </div>
 
@@ -98,7 +103,7 @@ const submit = () => {
                         :disabled="form.processing"
                         class="px-6 py-2 bg-gradient-to-r from-brand-primary to-brand-secondary text-white font-bold rounded shadow hover:opacity-90 transition disabled:opacity-50"
                     >
-                        Upload Song
+                        Update Song
                     </button>
                 </div>
             </form>

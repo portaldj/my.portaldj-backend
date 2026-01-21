@@ -62,9 +62,40 @@ const togglePlay = (song) => {
                                         <p class="text-sm text-gray-400">{{ song.artist_name }} • {{ song.bpm }} BPM</p>
                                     </div>
                                 </div>
-                                <button class="px-4 py-2 bg-brand-primary rounded hover:bg-violet-500 transition text-white text-sm font-bold">
-                                    Download
-                                </button>
+                                
+                                <div class="flex items-center">
+                                    <template v-if="song.is_pro_only && !$page.props.auth.user.is_pro">
+                                        <a 
+                                            :href="route('subscription.index')" 
+                                            class="px-4 py-2 bg-brand-secondary rounded hover:bg-pink-600 transition text-white text-sm font-bold flex items-center"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                                            </svg>
+                                            Subscribe
+                                        </a>
+                                    </template>
+                                    <template v-else>
+                                        <div class="flex space-x-2">
+                                            <a 
+                                                v-if="song.download_url"
+                                                :href="song.download_url" 
+                                                target="_blank"
+                                                class="px-4 py-2 bg-gray-700 rounded hover:bg-gray-600 transition text-white text-sm font-bold border border-gray-600"
+                                                title="Alternative Download"
+                                            >
+                                                Alt DL
+                                            </a>
+                                            <a 
+                                                :href="song.file_path ? `/storage/${song.file_path}` : '#'" 
+                                                :download="song.track_name"
+                                                class="px-4 py-2 bg-brand-primary rounded hover:bg-violet-500 transition text-white text-sm font-bold"
+                                            >
+                                                Download
+                                            </a>
+                                        </div>
+                                    </template>
+                                </div>
                             </li>
                         </ul>
                         

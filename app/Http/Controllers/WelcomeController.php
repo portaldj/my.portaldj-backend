@@ -52,7 +52,7 @@ class WelcomeController extends Controller
             'phpVersion' => PHP_VERSION,
             'latestDJs' => $latestDJs,
             'filters' => [
-                'countries' => Country::with('cities')->get(['id', 'name']),
+                'countries' => Country::active()->with(['cities' => fn($q) => $q->active()])->get(['id', 'name']),
             ],
             'request' => $request->only(['search', 'country_id', 'city_id']),
         ]);

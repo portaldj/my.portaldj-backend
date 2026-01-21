@@ -18,4 +18,10 @@ class Chapter extends Model
         return $this->hasOne(Exam::class);
     }
 
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'chapter_user')
+            ->withPivot('completed_at')
+            ->withTimestamps();
+    }
 }

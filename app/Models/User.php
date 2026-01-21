@@ -27,6 +27,7 @@ class User extends Authenticatable
         'ban_reason',
         'openai_key',
         'gemini_key',
+        'last_trial_at',
     ];
 
     /**
@@ -52,6 +53,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'openai_key' => 'encrypted',
             'gemini_key' => 'encrypted',
+            'last_trial_at' => 'datetime',
         ];
     }
 
@@ -98,5 +100,26 @@ class User extends Authenticatable
     public function equipment()
     {
         return $this->hasMany(DjEquipment::class);
+    }
+
+    public function completedChapters()
+    {
+        return $this->belongsToMany(Chapter::class, 'chapter_user')->withTimestamps();
+    }
+
+    public function subscriptions()
+    {
+        return $this->hasMany(Subscription::class);
+    }
+
+    public function getIsProAttribute()
+    {
+        // Check for role 'Admin' (always pro)
+        if ($this->hasRole('Admin')) {
+            return true;
+        }
+
+        // Check active subscription
+        return $this->subscriptions()->active()->exists();
     }
 }

@@ -14,7 +14,7 @@ const form = useForm({
 });
 
 const submit = () => {
-    form.post(route('admin.academy.chapters.store', props.course.id), {
+    form.post(route('admin.academy.chapters.store', props.course), {
         onSuccess: () => {
              form.reset();
              form.order = props.course.chapters.length + 1;
@@ -38,6 +38,7 @@ const deleteChapter = (id) => {
                 <Link :href="route('admin.academy.index')" class="text-gray-400 hover:text-white">&larr; Courses</Link>
                 <span class="text-gray-600">/</span>
                 <span>{{ course.title }}</span>
+                <Link :href="route('admin.academy.edit', course.id)" class="ml-4 text-xs bg-blue-600 text-white px-2 py-1 rounded">Edit Details</Link>
             </div>
         </template>
 
@@ -73,10 +74,12 @@ const deleteChapter = (id) => {
                     <div>
                         <label class="block text-xs font-bold text-gray-400 uppercase">Video URL</label>
                         <input v-model="form.video_url" type="url" placeholder="https://youtube.com/..." class="w-full bg-gray-900 border-gray-700 rounded text-white text-sm" />
+                        <div v-if="form.errors.video_url" class="text-red-500 text-xs mt-1">{{ form.errors.video_url }}</div>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-400 uppercase">Content / Notes</label>
                         <textarea v-model="form.content" rows="3" class="w-full bg-gray-900 border-gray-700 rounded text-white text-sm"></textarea>
+                        <div v-if="form.errors.content" class="text-red-500 text-xs mt-1">{{ form.errors.content }}</div>
                     </div>
                     <button type="submit" :disabled="form.processing" class="w-full py-2 bg-brand-primary text-white rounded font-bold hover:bg-violet-600">
                         Add Chapter

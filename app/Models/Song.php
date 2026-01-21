@@ -14,6 +14,7 @@ class Song extends Model
         'remix_type',
         'genre_id',
         'file_path',
+        'download_url',
         'is_pro_only'
     ];
 

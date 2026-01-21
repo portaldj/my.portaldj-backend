@@ -12,7 +12,12 @@ class UserController extends Controller
 {
     public function index(Request $request)
     {
-        $query = User::with('roles')->latest();
+        $query = User::with([
+            'roles',
+            'subscriptions' => function ($q) {
+                $q->latest()->limit(1);
+            }
+        ])->latest();
 
         if ($request->has('search')) {
             $search = $request->input('search');
@@ -54,14 +59,20 @@ class UserController extends Controller
         ]);
 
         // Create Profile
+        $nameParts = explode(' ', $validated['name'], 2);
+        $firstName = $nameParts[0];
+        $lastName = $nameParts[1] ?? '';
+
         $user->profile()->create([
             'username' => $validated['username'],
+            'first_name' => $firstName,
+            'last_name' => $lastName,
         ]);
 
         if (isset($validated['roles'])) {
             $user->assignRole($validated['roles']);
         } else {
-            $user->assignRole('User');
+            $user->assignRole('DJ');
         }
 
         return redirect()->route('admin.users.index')->with('success', 'User created successfully.');
@@ -113,5 +124,47 @@ class UserController extends Controller
 
         $user->delete();
         return redirect()->route('admin.users.index')->with('success', 'User deleted.');
+    }
+
+    public function manageSubscription(Request $request, User $user)
+    {
+        $validated = $request->validate([
+            'action' => 'required|in:grant,revoke,update',
+            'expires_at' => 'nullable|date',
+        ]);
+
+        if ($validated['action'] === 'grant') {
+            $user->subscriptions()->create([
+                'plan_id' => 'admin_grant',
+                'status' => 'paid',
+                'amount' => 0,
+                'flow_order' => 'ADMIN-' . uniqid(),
+                'paid_at' => now(),
+                'expires_at' => $validated['expires_at'] ?? now()->addMonth(),
+            ]);
+            return back()->with('success', 'Subscription granted.');
+        }
+
+        if ($validated['action'] === 'revoke') {
+            // Cancel all active
+            $user->subscriptions()->active()->update([
+                'status' => 'cancelled',
+                'expires_at' => now(),
+            ]);
+            return back()->with('success', 'Subscription revoked.');
+        }
+
+        if ($validated['action'] === 'update') {
+            $sub = $user->subscriptions()->latest()->first();
+            if ($sub) {
+                $sub->update([
+                    'expires_at' => $validated['expires_at'] ?? $sub->expires_at,
+                    'status' => 'paid' // Re-activate if needed?
+                ]);
+            }
+            return back()->with('success', 'Subscription updated.');
+        }
+
+        return back();
     }
 }

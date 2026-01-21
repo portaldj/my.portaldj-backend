@@ -43,4 +43,10 @@ return [
         'api_key' => env('GEMINI_API_KEY'),
     ],
 
+    'flow' => [
+        'api_key' => env('FLOW_API_KEY'),
+        'secret_key' => env('FLOW_SECRET_KEY'),
+        'env' => env('FLOW_ENV', 'sandbox'),
+    ],
+
 ];

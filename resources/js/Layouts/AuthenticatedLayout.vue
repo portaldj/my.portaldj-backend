@@ -5,13 +5,15 @@ import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
 import PremiumNavLink from '@/Components/PremiumNavLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
+import NavLink from '@/Components/NavLink.vue';
 import { Link, usePage } from '@inertiajs/vue3';
 
 const showingNavigationDropdown = ref(false);
-const user = usePage().props.auth.user;
-const roles = user?.roles || [];
+const page = usePage();
+const user = computed(() => page.props.auth.user);
+const roles = computed(() => user.value?.roles || []);
 
-const isAdmin = computed(() => roles.includes('Admin'));
+const isAdmin = computed(() => roles.value.includes('Admin'));
 </script>
 
 <template>
@@ -41,9 +43,12 @@ const isAdmin = computed(() => roles.includes('Admin'));
                             <PremiumNavLink :href="route('academy') || route('academy.*')" :active="route().current('academy') || route().current('academy.*')">
                                 Academy
                             </PremiumNavLink>
-                            <PremiumNavLink :href="route('assistant.index')" :active="route().current('assistant.*')">
+                            <NavLink :href="route('assistant.index')" :active="route().current('assistant.*')">
                                 AI Assistant
-                            </PremiumNavLink>
+                            </NavLink>
+                            <NavLink v-if="$page.props.auth.user && !$page.props.auth.user.is_pro" :href="route('subscription.index')" :active="route().current('subscription.*')" class="text-yellow-500 font-bold">
+                                Upgrade to PRO
+                            </NavLink>
                             <PremiumNavLink v-if="isAdmin" :href="route('admin.dashboard')" :active="route().current('admin.*')" class="text-red-400 hover:text-red-300 border-red-500">
                                 Admin Panel
                             </PremiumNavLink>
@@ -126,8 +131,11 @@ const isAdmin = computed(() => roles.includes('Admin'));
                         Academy
                     </ResponsiveNavLink>
                     <ResponsiveNavLink :href="route('assistant.index')" :active="route().current('assistant.*')">
-                        AI Assistant
-                    </ResponsiveNavLink>
+                    AI Assistant
+                </ResponsiveNavLink>
+                <ResponsiveNavLink v-if="$page.props.auth.user && !$page.props.auth.user.is_pro" :href="route('subscription.index')" :active="route().current('subscription.*')" class="text-yellow-600 font-bold bg-yellow-50">
+                    Upgrade to PRO
+                </ResponsiveNavLink>
                      <ResponsiveNavLink v-if="isAdmin" :href="route('admin.dashboard')" :active="route().current('admin.*')" class="text-red-400">
                         Admin Panel
                     </ResponsiveNavLink>
@@ -160,6 +168,26 @@ const isAdmin = computed(() => roles.includes('Admin'));
 
         <!-- Page Content -->
         <main>
+            <!-- Flash Messages -->
+            <div v-if="$page.props.flash.success" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+                    <strong class="font-bold">Success! </strong>
+                    <span class="block sm:inline">{{ $page.props.flash.success }}</span>
+                </div>
+            </div>
+            <div v-if="$page.props.flash.error" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                    <strong class="font-bold">Error! </strong>
+                    <span class="block sm:inline">{{ $page.props.flash.error }}</span>
+                </div>
+            </div>
+            <div v-if="$page.props.flash.message" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+                <div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative" role="alert">
+                    <strong class="font-bold">Info: </strong>
+                    <span class="block sm:inline">{{ $page.props.flash.message }}</span>
+                </div>
+            </div>
+
             <slot />
         </main>
     </div>

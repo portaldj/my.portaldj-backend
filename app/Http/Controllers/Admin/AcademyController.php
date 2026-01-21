@@ -28,6 +28,7 @@ class AcademyController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'thumbnail' => 'nullable|image|max:10240', // 10MB
+            'is_pro' => 'boolean',
         ]);
 
         if ($request->hasFile('thumbnail')) {
@@ -38,6 +39,36 @@ class AcademyController extends Controller
         $course = Course::create($validated);
 
         return redirect()->route('admin.academy.show', $course->id)->with('success', 'Course created. Now add chapters.');
+    }
+
+    public function edit(Course $course)
+    {
+        return Inertia::render('Admin/Academy/Edit', [
+            'course' => $course
+        ]);
+    }
+
+    public function update(Request $request, Course $course)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'thumbnail' => 'nullable|image|max:10240',
+            'is_pro' => 'boolean',
+        ]);
+
+        if ($request->hasFile('thumbnail')) {
+            // Delete old
+            if ($course->thumbnail_path) {
+                Storage::disk('public')->delete($course->thumbnail_path);
+            }
+            $path = $request->file('thumbnail')->store('thumbnails', 'public');
+            $validated['thumbnail_path'] = $path;
+        }
+
+        $course->update($validated);
+
+        return redirect()->route('admin.academy.index')->with('success', 'Course updated successfully.');
     }
 
     public function show(Course $course)
@@ -98,5 +129,11 @@ class AcademyController extends Controller
 
         $status = $course->is_active ? 'activated' : 'deactivated';
         return redirect()->back()->with('success', "Course {$status}.");
+    }
+
+    public function togglePro(Course $course)
+    {
+        $course->update(['is_pro' => !$course->is_pro]);
+        return back();
     }
 }

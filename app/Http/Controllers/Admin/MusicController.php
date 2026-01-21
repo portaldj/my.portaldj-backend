@@ -36,6 +36,7 @@ class MusicController extends Controller
             'genre_id' => 'required|exists:music_genres,id',
             'is_pro_only' => 'boolean',
             'file' => 'required|file|mimes:mp3,wav|max:20480', // 20MB max
+            'download_url' => 'nullable|url|max:255',
         ]);
 
         if ($request->hasFile('file')) {
@@ -46,6 +47,43 @@ class MusicController extends Controller
         Song::create($validated);
 
         return redirect()->route('admin.music.index')->with('success', 'Song uploaded successfully.');
+    }
+
+    public function edit(Song $song)
+    {
+        return Inertia::render('Admin/Music/Edit', [
+            'song' => $song,
+            'genres' => MusicGenre::all()
+        ]);
+    }
+
+    public function update(Request $request, Song $song)
+    {
+        $validated = $request->validate([
+            'track_name' => 'required|string|max:255',
+            'artist_name' => 'required|string|max:255',
+            'bpm' => 'required|integer|min:50|max:200',
+            'key' => 'nullable|string|max:10',
+            'remix_type' => 'nullable|string|max:50',
+            'genre_id' => 'required|exists:music_genres,id',
+            'is_pro_only' => 'boolean',
+            'file' => 'nullable|file|mimes:mp3,wav|max:20480', // 20MB max
+            'download_url' => 'nullable|url|max:255',
+        ]);
+
+        if ($request->hasFile('file')) {
+            // Delete old file
+            if ($song->file_path && Storage::disk('public')->exists($song->file_path)) {
+                Storage::disk('public')->delete($song->file_path);
+            }
+            // Upload new file
+            $path = $request->file('file')->store('songs', 'public');
+            $validated['file_path'] = $path;
+        }
+
+        $song->update($validated);
+
+        return redirect()->route('admin.music.index')->with('success', 'Song updated successfully.');
     }
 
     public function destroy(Song $song)

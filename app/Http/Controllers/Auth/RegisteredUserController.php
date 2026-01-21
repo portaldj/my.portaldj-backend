@@ -21,7 +21,7 @@ class RegisteredUserController extends Controller
     public function create(): Response
     {
         return Inertia::render('Auth/Register', [
-            'countries' => \App\Models\Country::with('cities')->get(),
+            'countries' => \App\Models\Country::active()->with(['cities' => fn($q) => $q->active()])->get(),
             'djTypes' => \App\Models\DjType::all(),
         ]);
     }

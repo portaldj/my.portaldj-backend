@@ -24,8 +24,11 @@ class ProfileController extends Controller
 
     public function show(string $username)
     {
-        $user = User::whereHas('profile', function ($query) use ($username) {
-            $query->where('username', $username);
+        $user = User::where(function ($q) use ($username) {
+            $q->where('id', $username)
+                ->orWhereHas('profile', function ($query) use ($username) {
+                    $query->where('username', $username);
+                });
         })->with([
                     'profile.city.country',
                     'profile.djType',
@@ -52,13 +55,13 @@ class ProfileController extends Controller
         return Inertia::render('Profile/Edit', [
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => session('status'),
-            'countries' => \App\Models\Country::with('cities')->get(),
+            'countries' => \App\Models\Country::active()->with(['cities' => fn($q) => $q->active()])->get(),
             'djTypes' => \App\Models\DjType::all(),
             'socialPlatforms' => \App\Models\SocialPlatform::all(),
             'clubs' => \App\Models\Club::select('id', 'name')->orderBy('name')->get(),
             'brands' => \App\Models\Brand::select('id', 'name')->orderBy('name')->get(),
             'equipmentTypes' => \App\Models\EquipmentType::select('id', 'name')->orderBy('name')->get(),
-            'user' => $request->user()->load('profile', 'socialNetworks.platform', 'experiences', 'equipment.brand', 'equipment.type', 'equipment.equipmentModel.brand', 'equipment.equipmentModel.type'),
+            'user' => $request->user()->fresh()->load('profile', 'socialNetworks.platform', 'experiences', 'equipment.brand', 'equipment.type', 'equipment.equipmentModel.brand', 'equipment.equipmentModel.type'),
         ]);
     }
 
@@ -109,10 +112,10 @@ class ProfileController extends Controller
 
         $request->user()->save();
 
-        // Security: Prevent non-admins from updating their username
-        if (!$request->user()->hasRole('Admin')) {
-            unset($validated['username']);
-        }
+        // Security: Allow users to update their username (Validation handles uniqueness)
+        // if (!$request->user()->hasRole('Admin')) {
+        //    unset($validated['username']);
+        // }
 
         // Update Profile via Service
         $this->profileService->updateProfile($request->user(), $validated);

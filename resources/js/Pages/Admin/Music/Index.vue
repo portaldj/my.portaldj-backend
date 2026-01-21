@@ -48,7 +48,8 @@ const deleteSong = (id) => {
                             <span v-if="song.is_pro_only" class="ml-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-brand-secondary text-white">PRO</span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">{{ song.genre?.name }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                            <Link :href="route('admin.music.edit', song.id)" class="text-brand-primary hover:text-indigo-400 mr-2">Edit</Link>
                             <button @click="deleteSong(song.id)" class="text-red-400 hover:text-red-300">Delete</button>
                         </td>
                     </tr>

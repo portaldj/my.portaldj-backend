@@ -23,6 +23,12 @@ class AssistantController extends Controller
      */
     public function index(Request $request)
     {
+        // Check PRO Access
+        $assistantIsPro = \App\Models\Setting::where('key', 'assistant_is_pro')->value('value') === '1';
+        if ($assistantIsPro && !$request->user()->is_pro) {
+            return redirect()->route('subscription.index')->with('message', 'The AI Assistant is for PRO members only.');
+        }
+
         // Get user's equipment where the related model has documentation
         $equipments = DjEquipment::where('user_id', $request->user()->id)
             ->whereNotNull('equipment_model_id')
@@ -42,6 +48,12 @@ class AssistantController extends Controller
      */
     public function show(Request $request, EquipmentModel $model)
     {
+        // Check PRO Access
+        $assistantIsPro = \App\Models\Setting::where('key', 'assistant_is_pro')->value('value') === '1';
+        if ($assistantIsPro && !$request->user()->is_pro) {
+            return redirect()->route('subscription.index')->with('message', 'The AI Assistant is for PRO members only.');
+        }
+
         // Ensure the user actually owns this equipment
         $ownsEquipment = DjEquipment::where('user_id', $request->user()->id)
             ->where('equipment_model_id', $model->id)
@@ -69,6 +81,12 @@ class AssistantController extends Controller
             'message' => 'required|string|max:1000',
             'provider' => 'required|in:openai,gemini',
         ]);
+
+        // Check PRO Access
+        $assistantIsPro = \App\Models\Setting::where('key', 'assistant_is_pro')->value('value') === '1';
+        if ($assistantIsPro && !$request->user()->is_pro) {
+            return response()->json(['error' => 'PRO subscription required.'], 403);
+        }
 
         // Security check
         $ownsEquipment = DjEquipment::where('user_id', $request->user()->id)

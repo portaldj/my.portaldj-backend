@@ -12,7 +12,7 @@ const form = useForm({
     username: '',
     password: '',
     password_confirmation: '',
-    roles: ['User'], // Default role
+    roles: ['DJ'], // Default role
 });
 
 import { object, string, ref as yupRef } from 'yup';
@@ -106,6 +106,7 @@ const submit = async () => {
                             required
                             class="mt-1 block w-full rounded bg-gray-900 border-gray-700 text-white shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm"
                         />
+                        <div v-if="form.errors.password_confirmation" class="text-red-500 text-xs mt-1">{{ form.errors.password_confirmation }}</div>
                     </div>
                 </div>
 
@@ -122,6 +123,7 @@ const submit = async () => {
                             <label class="ml-2 text-gray-300">{{ role.name }}</label>
                         </div>
                     </div>
+                    <div v-if="form.errors.roles" class="text-red-500 text-xs mt-1">{{ form.errors.roles }}</div>
                 </div>
 
                 <div class="flex justify-end gap-4 pt-6 border-t border-gray-700">

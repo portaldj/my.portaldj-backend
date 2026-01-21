@@ -23,8 +23,11 @@ const submitCountry = () => {
         onSuccess: () => countryForm.reset(),
     });
 };
+const toggleCountry = (country) => {
+    router.post(route('admin.countries.toggle', country.id), {}, { preserveScroll: true });
+};
 const deleteCountry = (id) => {
-    if (confirm('Delete this country?')) router.delete(route('admin.countries.destroy', id));
+    if (confirm('Delete this country?')) router.delete(route('admin.countries.destroy', id), { preserveScroll: true });
 };
 
 // City Form
@@ -34,8 +37,11 @@ const submitCity = () => {
         onSuccess: () => cityForm.reset(),
     });
 };
+const toggleCity = (city) => {
+    router.post(route('admin.cities.toggle', city.id), {}, { preserveScroll: true });
+};
 const deleteCity = (id) => {
-    if (confirm('Delete this city?')) router.delete(route('admin.cities.destroy', id));
+    if (confirm('Delete this city?')) router.delete(route('admin.cities.destroy', id), { preserveScroll: true });
 };
 
 // Club Form
@@ -46,7 +52,7 @@ const submitClub = () => {
     });
 };
 const deleteClub = (id) => {
-    if (confirm('Delete this club?')) router.delete(route('admin.clubs.destroy', id));
+    if (confirm('Delete this club?')) router.delete(route('admin.clubs.destroy', id), { preserveScroll: true });
 };
 
 // DJ Type Form
@@ -57,7 +63,7 @@ const submitDjType = () => {
     });
 };
 const deleteDjType = (id) => {
-    if (confirm('Delete this DJ Type?')) router.delete(route('admin.dj-types.destroy', id));
+    if (confirm('Delete this DJ Type?')) router.delete(route('admin.dj-types.destroy', id), { preserveScroll: true });
 };
 </script>
 
@@ -105,9 +111,17 @@ const deleteDjType = (id) => {
                     <div class="md:col-span-2 bg-gray-800 p-6 rounded-lg shadow border border-gray-700">
                         <h3 class="text-lg font-bold text-white mb-4">Countries List</h3>
                         <ul class="space-y-2 max-h-96 overflow-y-auto">
-                            <li v-for="country in countries" :key="country.id" class="flex justify-between items-center bg-gray-700/50 p-3 rounded">
-                                <span class="text-gray-200">{{ country.name }} ({{ country.code }})</span>
-                                <button @click="deleteCountry(country.id)" class="text-red-400 hover:text-red-300 text-sm">Delete</button>
+                            <li v-for="country in countries" :key="country.id" class="flex justify-between items-center bg-gray-700/50 p-3 rounded group">
+                                <span class="text-gray-200" :class="{ 'opacity-50 line-through': !country.is_active }">
+                                    {{ country.name }} ({{ country.code }}) 
+                                    <span v-if="!country.is_active" class="ml-2 text-xs text-red-400 font-bold no-underline inline-block">(Inactive)</span>
+                                </span>
+                                <div class="flex items-center space-x-3">
+                                    <button @click="toggleCountry(country)" class="text-xs font-semibold hover:underline" :class="country.is_active ? 'text-yellow-400' : 'text-green-400'">
+                                        {{ country.is_active ? 'Deactivate' : 'Activate' }}
+                                    </button>
+                                    <button @click="deleteCountry(country.id)" class="text-red-400 hover:text-red-300 text-sm">Delete</button>
+                                </div>
                             </li>
                         </ul>
                     </div>
@@ -138,8 +152,16 @@ const deleteDjType = (id) => {
                          <h3 class="text-lg font-bold text-white mb-4">Cities List</h3>
                          <ul class="space-y-2 max-h-96 overflow-y-auto">
                             <li v-for="city in cities" :key="city.id" class="flex justify-between items-center bg-gray-700/50 p-3 rounded">
-                                <span class="text-gray-200">{{ city.name }}, {{ city.country?.name }}</span>
-                                <button @click="deleteCity(city.id)" class="text-red-400 hover:text-red-300 text-sm">Delete</button>
+                                <span class="text-gray-200" :class="{ 'opacity-50 line-through': !city.is_active }">
+                                    {{ city.name }}, {{ city.country?.name }}
+                                     <span v-if="!city.is_active" class="ml-2 text-xs text-red-400 font-bold no-underline inline-block">(Inactive)</span>
+                                </span>
+                                <div class="flex items-center space-x-3">
+                                    <button @click="toggleCity(city)" class="text-xs font-semibold hover:underline" :class="city.is_active ? 'text-yellow-400' : 'text-green-400'">
+                                        {{ city.is_active ? 'Deactivate' : 'Activate' }}
+                                    </button>
+                                    <button @click="deleteCity(city.id)" class="text-red-400 hover:text-red-300 text-sm">Delete</button>
+                                </div>
                             </li>
                         </ul>
                     </div>
