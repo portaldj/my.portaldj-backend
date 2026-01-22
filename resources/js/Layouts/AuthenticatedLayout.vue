@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
@@ -14,6 +14,59 @@ const user = computed(() => page.props.auth.user);
 const roles = computed(() => user.value?.roles || []);
 
 const isAdmin = computed(() => roles.value.includes('Admin'));
+
+import Toast from '@/Components/Toast.vue';
+
+const toasts = ref([]);
+let toastId = 0;
+
+const addToast = (message, type = 'info') => {
+    const id = toastId++;
+    toasts.value.push({ id, message, type });
+    // Cleanup if too many? For now let them self-dismiss
+};
+
+const removeToast = (id) => {
+    const index = toasts.value.findIndex(t => t.id === id);
+    if (index !== -1) {
+        toasts.value.splice(index, 1);
+    }
+};
+
+// Watch for flash messages from Inertia
+// We need to watch the props deeply or just the flash object
+watch(() => page.props.flash, (newFlash) => {
+    if (newFlash.success) {
+        addToast(newFlash.success, 'success');
+    }
+    if (newFlash.error) {
+        addToast(newFlash.error, 'error');
+    }
+    if (newFlash.message) {
+        addToast(newFlash.message, 'info');
+    }
+}, { deep: true, immediate: true });
+
+onMounted(() => {
+    // 1. Handle BF Cache (Back/Forward)
+    window.addEventListener('pageshow', (event) => {
+        if (event.persisted) {
+            window.location.reload();
+        }
+    });
+
+    // 2. Explicit Session Check
+    // If we are looking at a cached page, this request will fail if the session is dead.
+    // Only check if we have a user (guest users don't need session verification)
+    if (page.props.auth.user) {
+        axios.get('/verify-session')
+            .catch(error => {
+                if (error.response && (error.response.status === 401 || error.response.status === 419)) {
+                    window.location.href = '/';
+                }
+            });
+    }
+});
 </script>
 
 <template>
@@ -169,23 +222,24 @@ const isAdmin = computed(() => roles.value.includes('Admin'));
         <!-- Page Content -->
         <main>
             <!-- Flash Messages -->
-            <div v-if="$page.props.flash.success" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
-                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
-                    <strong class="font-bold">{{ __('Success!') }} </strong>
-                    <span class="block sm:inline">{{ $page.props.flash.success }}</span>
-                </div>
-            </div>
-            <div v-if="$page.props.flash.error" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
-                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-                    <strong class="font-bold">{{ __('Error!') }} </strong>
-                    <span class="block sm:inline">{{ $page.props.flash.error }}</span>
-                </div>
-            </div>
-            <div v-if="$page.props.flash.message" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
-                <div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative" role="alert">
-                    <strong class="font-bold">{{ __('Info:') }} </strong>
-                    <span class="block sm:inline">{{ $page.props.flash.message }}</span>
-                </div>
+            <!-- Flash Messages (Toast Container) -->
+            <div class="fixed bottom-5 right-5 z-50 flex flex-col gap-3">
+                <TransitionGroup 
+                    enter-active-class="transform ease-out duration-300 transition"
+                    enter-from-class="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
+                    enter-to-class="translate-y-0 opacity-100 sm:translate-x-0"
+                    leave-active-class="transition ease-in duration-100"
+                    leave-from-class="opacity-100"
+                    leave-to-class="opacity-0"
+                >
+                    <Toast 
+                        v-for="toast in toasts" 
+                        :key="toast.id" 
+                        :message="toast.message" 
+                        :type="toast.type" 
+                        @close="removeToast(toast.id)"
+                    />
+                </TransitionGroup>
             </div>
 
             <slot />

@@ -17,12 +17,14 @@ const props = defineProps({
     djTypes: Array,
     socialPlatforms: Array,
     clubs: Array, // Passed from controller
+    allGenres: Array,
     user: Object,
 });
 
 const user = props.user || usePage().props.auth.user;
 
 import AutocompleteInput from '@/Components/AutocompleteInput.vue';
+import MultiSelect from '@/Components/MultiSelect.vue';
 
 const form = useForm({
     name: user.name,
@@ -35,6 +37,9 @@ const form = useForm({
     city_id: user.profile?.city_id || '',
     dj_type_id: user.profile?.dj_type_id || '',
     profile_image: null,
+    is_email_public: !!user.profile?.is_email_public,
+    is_phone_public: !!user.profile?.is_phone_public,
+    genres: user.genres || [],
     social_networks: user.social_networks ? user.social_networks.map(n => ({
         social_platform_id: n.social_platform_id,
         url: n.url,
@@ -106,6 +111,9 @@ const profileSchema = object({
     email: string().required('Email is required').email('Must be a valid email address'),
     username: string().required('Username is required'),
     phone: string().nullable(),
+    is_email_public: boolean(),
+    is_phone_public: boolean(),
+    genres: array(),
     biography: string().nullable(),
     social_networks: array().of(
         object({
@@ -146,6 +154,7 @@ const submit = async () => {
                 ...e,
                 end_date: e.current ? null : e.end_date
             })),
+            genres: data.genres.map(g => g.id),
             _method: 'PATCH',
         })).post(route('profile.update'), {
             forceFormData: true,
@@ -293,6 +302,36 @@ const submit = async () => {
                     </select>
                 </div>
             </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                 <div>
+                    <InputLabel for="genres" :value="__('Musical Genres')" />
+                    <div class="mt-1">
+                        <MultiSelect
+                            v-model="form.genres"
+                            :items="allGenres"
+                            :placeholder="__('Select Genres')"
+                        />
+                    </div>
+                     <InputError class="mt-2" :message="form.errors.genres" />
+                </div>
+
+                 <div>
+                    <InputLabel :value="__('Privacy')" />
+                    <div class="mt-2 space-y-2 bg-gray-50 dark:bg-gray-800 p-3 rounded-lg border border-gray-200 dark:border-gray-700">
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="checkbox" v-model="form.is_email_public" class="rounded border-gray-300 text-brand-primary focus:ring-brand-primary">
+                            <span class="text-sm text-gray-700 dark:text-gray-300">{{ __('Show Email on Public Profile') }}</span>
+                        </label>
+                         <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="checkbox" v-model="form.is_phone_public" class="rounded border-gray-300 text-brand-primary focus:ring-brand-primary">
+                            <span class="text-sm text-gray-700 dark:text-gray-300">{{ __('Show Phone on Public Profile') }}</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+
 
             <div>
                  <InputLabel for="biography" :value="__('Biography')" />

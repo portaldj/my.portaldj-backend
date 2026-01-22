@@ -37,10 +37,13 @@ class ProfileService
                 'profile_image_path'
             ];
 
-            // Only update username if explicitly provided (and allowed by controller)
             if (isset($data['username'])) {
                 $profileAttributes[] = 'username';
             }
+
+            // Privacy Fields
+            $profileAttributes[] = 'is_email_public';
+            $profileAttributes[] = 'is_phone_public';
 
             $profileData = collect($data)->only($profileAttributes)->toArray();
 
@@ -87,6 +90,11 @@ class ProfileService
                         'end_date' => $exp['end_date'] ?? null,
                     ]);
                 }
+            }
+
+            // Sync Genres
+            if (isset($data['genres'])) {
+                $user->genres()->sync($data['genres']);
             }
 
             return $user->load('profile', 'socialNetworks', 'experiences');

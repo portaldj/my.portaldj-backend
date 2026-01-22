@@ -16,12 +16,14 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\HandleInertiaRequests::class,
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
             \App\Http\Middleware\SetLocale::class,
+            \App\Http\Middleware\PreventBackHistory::class,
         ]);
 
         $middleware->alias([
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
+            'prevent-back-history' => \App\Http\Middleware\PreventBackHistory::class,
         ]);
 
         $middleware->validateCsrfTokens(except: [

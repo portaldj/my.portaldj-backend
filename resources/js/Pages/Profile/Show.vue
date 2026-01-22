@@ -110,6 +110,16 @@ const formatDate = (dateString) => {
                     <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
                          <h3 class="text-lg font-bold text-white mb-4">{{ __('Details') }}</h3>
                          <div class="space-y-4">
+                            <div v-if="profile.is_email_public && user.email">
+                                <span class="block text-xs text-gray-500 uppercase font-bold">{{ __('Email') }}</span>
+                                <a :href="'mailto:' + user.email" class="text-gray-300 hover:text-white transition">{{ user.email }}</a>
+                            </div>
+
+                            <div v-if="profile.is_phone_public && profile.phone">
+                                <span class="block text-xs text-gray-500 uppercase font-bold">{{ __('Phone') }}</span>
+                                <span class="text-gray-300">{{ profile.phone }}</span>
+                            </div>
+
                             <div>
                                 <span class="block text-xs text-gray-500 uppercase font-bold">{{ __('Genres') }}</span>
                                 <div class="flex flex-wrap gap-2 mt-2">

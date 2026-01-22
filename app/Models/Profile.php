@@ -19,6 +19,8 @@ class Profile extends Model
         'address',
         'profile_image_path',
         'dj_type_id',
+        'is_email_public',
+        'is_phone_public',
     ];
 
     public function user()

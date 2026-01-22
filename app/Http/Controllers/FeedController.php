@@ -29,7 +29,7 @@ class FeedController extends Controller
 
         $this->feedService->createPost($request->user(), $validated);
 
-        return redirect()->back()->with('success', 'Post created successfully!');
+        return redirect()->back()->with('success', __('Post created successfully!'));
     }
 
     public function like($post): RedirectResponse
@@ -46,18 +46,18 @@ class FeedController extends Controller
 
         $this->feedService->addComment(auth()->user(), $post, $validated['content']);
 
-        return redirect()->back();
+        return redirect()->back()->with('success', __('Comment added successfully.'));
     }
 
     public function destroy($postId): RedirectResponse
     {
         $this->feedService->deletePost(auth()->user(), $postId);
-        return redirect()->back()->with('success', 'Post deleted successfully.');
+        return redirect()->back()->with('success', __('Post deleted successfully.'));
     }
 
     public function destroyComment($commentId): RedirectResponse
     {
         $this->feedService->deleteComment(auth()->user(), $commentId);
-        return redirect()->back()->with('success', 'Comment deleted successfully.');
+        return redirect()->back()->with('success', __('Comment deleted successfully.'));
     }
 }

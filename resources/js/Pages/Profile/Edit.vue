@@ -20,6 +20,7 @@ defineProps({
     clubs: Array,
     brands: Array,
     equipmentTypes: Array,
+    allGenres: Array,
     user: Object,
 });
 </script>
@@ -44,6 +45,7 @@ defineProps({
                         :djTypes="djTypes"
                         :socialPlatforms="socialPlatforms"
                         :clubs="clubs"
+                        :all-genres="allGenres"
                         :user="user"
                         class="max-w-xl"
                     />

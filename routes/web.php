@@ -8,6 +8,11 @@ use Inertia\Inertia;
 Route::get('/', [\App\Http\Controllers\WelcomeController::class, 'index']);
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    // Session Verification Route (for client-side active checking)
+    Route::get('/verify-session', function () {
+        return response()->noContent();
+    })->name('verify-session');
+
     Route::get('/dashboard', function (App\Services\FeedService $feedService) {
         return Inertia::render('Dashboard', [
             'posts' => $feedService->getGlobalFeed(),
@@ -81,7 +86,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return back(); // Inertia will reload props
     })->name('academy.chapters.complete');
 
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit')->middleware('prevent-back-history');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 

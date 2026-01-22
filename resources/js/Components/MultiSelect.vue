@@ -69,7 +69,7 @@ onUnmounted(() => {
 <template>
     <div class="relative" ref="containerRef">
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" v-if="modelValue.length > 0">
-            Selected Tags:
+            {{ __('Selected Tags:') }}
         </label>
         <div class="flex flex-wrap gap-2 mb-2" v-if="modelValue.length > 0">
             <div 

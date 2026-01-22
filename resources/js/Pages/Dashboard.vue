@@ -1,7 +1,7 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link, usePage, useForm, router } from '@inertiajs/vue3';
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import MultiSelect from '@/Components/MultiSelect.vue';
 
 const props = defineProps({
@@ -13,6 +13,13 @@ const props = defineProps({
 
 const user = usePage().props.auth.user;
 const isAdmin = computed(() => user.roles.includes('Admin'));
+
+const placeholderKey = ref('whats_spinning_1');
+
+onMounted(() => {
+    const randomNum = Math.floor(Math.random() * 5) + 1;
+    placeholderKey.value = `whats_spinning_${randomNum}`;
+});
 
 const postForm = useForm({
     content: '',
@@ -103,7 +110,7 @@ const deleteComment = (comment) => {
                                     v-model="postForm.content"
                                     class="w-full bg-gray-900 border border-gray-700 rounded-lg text-gray-200 focus:ring-brand-accent focus:border-brand-accent resize-none"
                                     rows="3"
-                                    placeholder="What's spinning?"
+                                    :placeholder="__(placeholderKey)"
                                     required
                                 ></textarea>
 
@@ -215,7 +222,7 @@ const deleteComment = (comment) => {
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                             </svg>
-                            <span>{{ post.comments_count }} Comments</span>
+                            <span>{{ post.comments_count }} {{ __('Comments') }}</span>
                         </button>
                     </div>
 

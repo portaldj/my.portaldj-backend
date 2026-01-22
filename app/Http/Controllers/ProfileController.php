@@ -57,11 +57,12 @@ class ProfileController extends Controller
             'status' => session('status'),
             'countries' => \App\Models\Country::active()->with(['cities' => fn($q) => $q->active()])->get(),
             'djTypes' => \App\Models\DjType::all(),
+            'allGenres' => \App\Models\MusicGenre::select('id', 'name')->orderBy('name')->get(),
             'socialPlatforms' => \App\Models\SocialPlatform::all(),
             'clubs' => \App\Models\Club::select('id', 'name')->orderBy('name')->get(),
             'brands' => \App\Models\Brand::select('id', 'name')->orderBy('name')->get(),
             'equipmentTypes' => \App\Models\EquipmentType::select('id', 'name')->orderBy('name')->get(),
-            'user' => $request->user()->fresh()->load('profile', 'socialNetworks.platform', 'experiences', 'equipment.brand', 'equipment.type', 'equipment.equipmentModel.brand', 'equipment.equipmentModel.type'),
+            'user' => $request->user()->fresh()->load('profile', 'socialNetworks.platform', 'experiences', 'equipment.brand', 'equipment.type', 'equipment.equipmentModel.brand', 'equipment.equipmentModel.type', 'genres'),
         ]);
     }
 
@@ -79,6 +80,10 @@ class ProfileController extends Controller
             // Add other fields
             'username' => ['required', 'string', 'max:255', \Illuminate\Validation\Rule::unique('profiles')->ignore($request->user()->profile->id ?? null)],
             'phone' => ['nullable', 'string', 'max:20'],
+            'is_email_public' => ['boolean'],
+            'is_phone_public' => ['boolean'],
+            'genres' => ['nullable', 'array'],
+            'genres.*' => ['exists:music_genres,id'],
             'country_id' => ['nullable', 'exists:countries,id'],
             'city_id' => ['nullable', 'exists:cities,id'],
             'dj_type_id' => ['nullable', 'exists:dj_types,id'],
@@ -122,9 +127,7 @@ class ProfileController extends Controller
         // Update Profile via Service
         $this->profileService->updateProfile($request->user(), $validated);
 
-        return Redirect::route('profile.edit');
-
-        return Redirect::route('profile.edit');
+        return Redirect::route('profile.edit')->with('success', __('Profile updated successfully.'));
     }
 
     /**
