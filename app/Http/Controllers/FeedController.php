@@ -35,32 +35,47 @@ class FeedController extends Controller
         return redirect()->back()->with('success', __('Post created successfully!'));
     }
 
-    public function like($post): RedirectResponse
+    public function like($post)
     {
-        $this->feedService->toggleLike(auth()->user(), $post);
-        return redirect()->back(); // Inertia will reload props
+        $liked = $this->feedService->toggleLike(auth()->user(), $post);
+        return response()->json(['liked' => $liked]);
     }
 
-    public function comment(Request $request, $post): RedirectResponse
+    public function comment(Request $request, $post)
     {
         $validated = $request->validate([
             'content' => 'required|string|max:500',
         ]);
 
-        $this->feedService->addComment(auth()->user(), $post, $validated['content']);
+        $comment = $this->feedService->addComment(auth()->user(), $post, $validated['content']);
 
-        return redirect()->back()->with('success', __('Comment added successfully.'));
+        // Eager load user profile for frontend display
+        $comment->load('user.profile');
+
+        return response()->json(['comment' => $comment, 'message' => __('Comment added successfully.')]);
     }
 
-    public function destroy($postId): RedirectResponse
+    public function destroy($postId)
     {
         $this->feedService->deletePost(auth()->user(), $postId);
-        return redirect()->back()->with('success', __('Post deleted successfully.'));
+        return response()->json(['message' => __('Post deleted successfully.')]);
     }
 
-    public function destroyComment($commentId): RedirectResponse
+    public function destroyComment($commentId)
     {
         $this->feedService->deleteComment(auth()->user(), $commentId);
-        return redirect()->back()->with('success', __('Comment deleted successfully.'));
+        return response()->json(['message' => __('Comment deleted successfully.')]);
+    }
+
+    public function getComments(Request $request, $postId)
+    {
+        $post = \App\Models\Post::findOrFail($postId);
+
+        $comments = $post->comments()
+            ->with('user.profile')
+            ->latest()
+            ->paginate(5); // Default page query param handles offset
+
+        return response()->json($comments);
     }
 }

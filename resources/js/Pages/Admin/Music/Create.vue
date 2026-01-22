@@ -13,8 +13,12 @@ const form = useForm({
     key: '',
     remix_type: '',
     genre_id: '',
+    visible_from: '',
+    visible_until: '',
+    download_limit: 2,
     is_pro_only: false,
     file: null,
+    preview_file: null,
     download_url: '',
 });
 
@@ -35,13 +39,24 @@ const submit = () => {
             <form @submit.prevent="submit" class="space-y-6">
                 <!-- File Upload -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-400">Audio File (MP3/WAV)</label>
+                    <label class="block text-sm font-medium text-gray-400">Main Audio File (Full Track - MP3/WAV)</label>
                     <input 
                         type="file" 
                         @input="form.file = $event.target.files[0]"
                         class="mt-1 block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-brand-primary file:text-white hover:file:bg-violet-600"
                     />
                     <div v-if="form.errors.file" class="text-red-500 text-xs mt-1">{{ form.errors.file }}</div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-400">Preview Audio (Optional - Lower Quality/Clip)</label>
+                    <input 
+                        type="file" 
+                        @input="form.preview_file = $event.target.files[0]"
+                        class="mt-1 block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-600 file:text-white hover:file:bg-gray-500"
+                    />
+                    <div v-if="form.errors.preview_file" class="text-red-500 text-xs mt-1">{{ form.errors.preview_file }}</div>
+                    <div class="text-xs text-gray-500 mt-1">If provided, this file plays in the browser. If not, the main file plays.</div>
                 </div>
 
                 <div>
@@ -87,7 +102,30 @@ const submit = () => {
                     </div>
                 </div>
 
-                <div class="flex items-center">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-gray-700 pt-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400">Visibility Start (Optional)</label>
+                        <input v-model="form.visible_from" type="datetime-local" class="mt-1 block w-full bg-gray-900 border-gray-700 rounded-md text-white shadow-sm focus:border-brand-primary focus:ring focus:ring-brand-primary focus:ring-opacity-50" />
+                        <div class="text-xs text-gray-500 mt-1">Leave empty to show immediately.</div>
+                        <div v-if="form.errors.visible_from" class="text-red-500 text-xs mt-1">{{ form.errors.visible_from }}</div>
+                    </div>
+
+                    <div>
+                         <label class="block text-sm font-medium text-gray-400">Visibility End (Optional)</label>
+                        <input v-model="form.visible_until" type="datetime-local" class="mt-1 block w-full bg-gray-900 border-gray-700 rounded-md text-white shadow-sm focus:border-brand-primary focus:ring focus:ring-brand-primary focus:ring-opacity-50" />
+                         <div class="text-xs text-gray-500 mt-1">Leave empty to show indefinitely.</div>
+                         <div v-if="form.errors.visible_until" class="text-red-500 text-xs mt-1">{{ form.errors.visible_until }}</div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-400">Download Limit (Per User)</label>
+                    <input v-model="form.download_limit" type="number" min="1" class="mt-1 block w-full bg-gray-900 border-gray-700 rounded-md text-white shadow-sm focus:border-brand-primary focus:ring focus:ring-brand-primary focus:ring-opacity-50" />
+                    <div class="text-xs text-gray-500 mt-1">How many times a user can download this track. Default is 2.</div>
+                    <div v-if="form.errors.download_limit" class="text-red-500 text-xs mt-1">{{ form.errors.download_limit }}</div>
+                </div>
+
+                <div class="flex items-center pt-4">
                     <input v-model="form.is_pro_only" type="checkbox" id="is_pro" class="rounded bg-gray-900 border-gray-700 text-brand-primary shadow-sm focus:border-brand-primary focus:ring focus:ring-brand-primary focus:ring-opacity-50" />
                     <label for="is_pro" class="ml-2 block text-sm text-gray-400">RESTRICT TO PRO USERS</label>
                 </div>

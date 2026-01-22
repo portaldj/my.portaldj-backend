@@ -13,6 +13,16 @@ const deleteSong = (id) => {
         form.delete(route('admin.music.destroy', id));
     }
 };
+
+const getStatus = (song) => {
+    const now = new Date();
+    const from = song.visible_from ? new Date(song.visible_from) : null;
+    const until = song.visible_until ? new Date(song.visible_until) : null;
+
+    if (from && now < from) return { label: 'Scheduled', class: 'bg-yellow-100 text-yellow-800' };
+    if (until && now > until) return { label: 'Expired', class: 'bg-red-100 text-red-800' };
+    return { label: 'Active', class: 'bg-green-100 text-green-800' };
+};
 </script>
 
 <template>
@@ -35,6 +45,7 @@ const deleteSong = (id) => {
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Track</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Artist</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Details</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Genre</th>
                         <th class="px-6 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">Actions</th>
                     </tr>
@@ -46,6 +57,11 @@ const deleteSong = (id) => {
                         <td class="px-6 py-4 whitespace-nowrap text-sm">
                             {{ song.bpm }} BPM • {{ song.key || '-' }}
                             <span v-if="song.is_pro_only" class="ml-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-brand-secondary text-white">PRO</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span :class="['px-2 inline-flex text-xs leading-5 font-semibold rounded-full', getStatus(song).class]">
+                                {{ getStatus(song).label }}
+                            </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">{{ song.genre?.name }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">

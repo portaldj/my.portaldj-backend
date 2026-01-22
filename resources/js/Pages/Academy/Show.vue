@@ -39,7 +39,7 @@ const markComplete = () => {
         <template #header>
             <div class="flex items-center justify-between">
                 <h2 class="text-xl font-semibold leading-tight text-white">
-                    <Link :href="route('academy')" class="text-gray-400 hover:text-white transition">&larr; Academy</Link>
+                    <Link :href="route('academy')" class="text-gray-400 hover:text-white transition">&larr; {{ __('Academy') }}</Link>
                     <span class="mx-2 text-gray-600">/</span>
                     {{ course.title }}
                 </h2>
@@ -55,7 +55,7 @@ const markComplete = () => {
                         <div v-if="currentChapter?.video_url" class="bg-black rounded-lg overflow-hidden shadow-lg border border-gray-800 aspect-video flex items-center justify-center relative group">
                             <!-- Placeholder Video Player -->
                             <div class="w-full h-full bg-gray-900 flex items-center justify-center">
-                                <span v-if="!iframeLoaded" class="absolute text-gray-500">Video Player Loading...</span>
+                                <span v-if="!iframeLoaded" class="absolute text-gray-500">{{ __('Video Player Loading...') }}</span>
                                 <iframe 
                                     v-if="currentChapter.video_url.includes('youtube')"
                                     :src="currentChapter.video_url.replace('watch?v=', 'embed/')" 
@@ -79,11 +79,11 @@ const markComplete = () => {
                                     @click="markComplete" 
                                     class="text-xs bg-brand-primary hover:bg-violet-600 text-white px-3 py-1 rounded transition"
                                 >
-                                    Mark as Complete
+                                    {{ __('Mark as Complete') }}
                                 </button>
                                 <span v-else-if="currentChapter?.is_completed" class="text-xs bg-green-600 text-white px-3 py-1 rounded flex items-center">
                                     <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                    Completed
+                                    {{ __('Completed') }}
                                 </span>
                             </div>
                             <p class="text-gray-300">{{ currentChapter?.content || course.description }}</p>
@@ -94,9 +94,9 @@ const markComplete = () => {
                     <div class="space-y-6">
                         <div class="bg-brand-surface rounded-lg shadow border border-gray-700 overflow-hidden">
                             <div class="p-4 bg-gray-800 border-b border-gray-700 flex justify-between items-center">
-                                <h3 class="font-bold text-gray-200">Course Content</h3>
+                                <h3 class="font-bold text-gray-200">{{ __('Course Content') }}</h3>
                                 <span class="text-xs text-gray-400">
-                                    {{ course.chapters.filter(c => c.is_completed).length }}/{{ course.chapters.length }} Completed
+                                    {{ course.chapters.filter(c => c.is_completed).length }}/{{ course.chapters.length }} {{ __('Completed') }}
                                 </span>
                             </div>
                             <ul class="divide-y divide-gray-700 max-h-[600px] overflow-y-auto">
@@ -135,13 +135,13 @@ const markComplete = () => {
 
                         <!-- Action Card -->
                         <div v-if="currentChapter?.exam" class="bg-gradient-to-br from-brand-primary to-brand-secondary p-6 rounded-lg shadow text-white">
-                            <h4 class="font-bold text-lg mb-2">Ready to test your knowledge?</h4>
-                            <p class="text-sm opacity-90 mb-4">Take the exam for this chapter to earn points.</p>
+                            <h4 class="font-bold text-lg mb-2">{{ __('Ready to test your knowledge?') }}</h4>
+                            <p class="text-sm opacity-90 mb-4">{{ __('Take the exam for this chapter to earn points.') }}</p>
                             <Link 
                                 :href="route('academy.exam', currentChapter.exam.id)"
                                 class="block w-full text-center bg-white text-brand-primary font-bold py-2 rounded shadow hover:bg-gray-100 transition"
                             >
-                                Take Exam
+                                {{ __('Take Exam') }}
                             </Link>
                         </div>
                     </div>

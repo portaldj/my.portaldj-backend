@@ -72,7 +72,7 @@ const submit = async () => {
         <form @submit.prevent="submit">
             <!-- Name -->
             <div>
-                <InputLabel for="name" value="Full Name" />
+                <InputLabel for="name" :value="__('Full Name')" />
                 <TextInput
                     id="name"
                     type="text"
@@ -87,7 +87,7 @@ const submit = async () => {
 
             <!-- Username -->
             <div class="mt-4">
-                <InputLabel for="username" value="Username (DJ Name)" />
+                <InputLabel for="username" :value="__('Username (DJ Name)')" />
                 <TextInput
                     id="username"
                     type="text"
@@ -100,7 +100,7 @@ const submit = async () => {
 
             <!-- Phone -->
             <div class="mt-4">
-                <InputLabel for="phone" value="Phone" />
+                <InputLabel for="phone" :value="__('Phone')" />
                 <TextInput
                     id="phone"
                     type="text"
@@ -113,14 +113,14 @@ const submit = async () => {
 
             <!-- DJ Type -->
             <div class="mt-4">
-                <InputLabel for="dj_type_id" value="DJ Type" />
+                <InputLabel for="dj_type_id" :value="__('DJ Type')" />
                 <select
                     id="dj_type_id"
                     v-model="form.dj_type_id"
                     class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 shadow-sm"
                     required
                 >
-                    <option value="" disabled>Select Type</option>
+                    <option value="" disabled>{{ __('Select Type') }}</option>
                     <option v-for="type in djTypes" :key="type.id" :value="type.id">
                         {{ type.name }}
                     </option>
@@ -131,14 +131,14 @@ const submit = async () => {
             <!-- Country & City -->
             <div class="mt-4 grid grid-cols-2 gap-4">
                 <div>
-                    <InputLabel for="country_id" value="Country" />
+                    <InputLabel for="country_id" :value="__('Country')" />
                     <select
                         id="country_id"
                         v-model="form.country_id"
                         class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 shadow-sm"
                         required
                     >
-                        <option value="" disabled>Select Country</option>
+                        <option value="" disabled>{{ __('Select Country') }}</option>
                         <option v-for="country in countries" :key="country.id" :value="country.id">
                             {{ country.name }}
                         </option>
@@ -146,7 +146,7 @@ const submit = async () => {
                     <InputError class="mt-2" :message="form.errors.country_id" />
                 </div>
                 <div>
-                    <InputLabel for="city_id" value="City" />
+                    <InputLabel for="city_id" :value="__('City')" />
                     <select
                         id="city_id"
                         v-model="form.city_id"
@@ -154,7 +154,7 @@ const submit = async () => {
                         required
                         :disabled="!form.country_id"
                     >
-                        <option value="" disabled>Select City</option>
+                        <option value="" disabled>{{ __('Select City') }}</option>
                         <option 
                             v-for="city in availableCities" 
                             :key="city.id" 
@@ -169,7 +169,7 @@ const submit = async () => {
 
             <!-- Email -->
             <div class="mt-4">
-                <InputLabel for="email" value="Email" />
+                <InputLabel for="email" :value="__('Email')" />
                 <TextInput
                     id="email"
                     type="email"
@@ -183,7 +183,7 @@ const submit = async () => {
 
             <!-- Password -->
             <div class="mt-4">
-                <InputLabel for="password" value="Password" />
+                <InputLabel for="password" :value="__('Password')" />
                 <TextInput
                     id="password"
                     type="password"
@@ -197,7 +197,7 @@ const submit = async () => {
 
             <!-- Confirm Password -->
             <div class="mt-4">
-                <InputLabel for="password_confirmation" value="Confirm Password" />
+                <InputLabel for="password_confirmation" :value="__('Confirm Password')" />
                 <TextInput
                     id="password_confirmation"
                     type="password"
@@ -214,7 +214,7 @@ const submit = async () => {
                     :href="route('login')"
                     class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:text-gray-400 dark:hover:text-gray-100 dark:focus:ring-offset-gray-800"
                 >
-                    Already registered?
+                    {{ __('Already registered?') }}
                 </Link>
 
                 <PrimaryButton
@@ -222,7 +222,7 @@ const submit = async () => {
                     :class="{ 'opacity-25': form.processing }"
                     :disabled="form.processing"
                 >
-                    Register
+                    {{ __('Register') }}
                 </PrimaryButton>
             </div>
         </form>

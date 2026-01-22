@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             TaxonomySeeder::class,
             SocialPlatformSeeder::class,
             AdminSeeder::class,
+            SettingsSeeder::class,
         ]);
 
         // User::factory(10)->create();

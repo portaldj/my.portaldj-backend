@@ -13,7 +13,7 @@ defineProps({
     <AuthenticatedLayout>
         <template #header>
             <h2 class="text-xl font-semibold leading-tight text-white">
-                Academy
+                {{ __('Academy') }}
             </h2>
         </template>
 
@@ -37,19 +37,19 @@ defineProps({
                             <div class="flex justify-between items-center mt-auto">
                                 <div class="flex items-center space-x-2">
                                      <span class="text-xs font-semibold px-2 py-1 bg-gray-800 rounded text-brand-secondary">
-                                        {{ course.chapters_count }} Chapters
+                                        {{ course.chapters_count }} {{ __('Chapters') }}
                                     </span>
                                     <span v-if="course.is_pro" class="text-xs font-bold px-2 py-1 bg-brand-primary text-white rounded uppercase">
                                         PRO
                                     </span>
                                     <span v-else class="text-xs font-bold px-2 py-1 bg-green-600 text-white rounded uppercase">
-                                        FREE
+                                        {{ __('FREE') }}
                                     </span>
                                 </div>
                                
                                 <Link :href="route('academy.show', course.id)" class="text-brand-accent hover:underline font-bold flex items-center">
-                                    <span v-if="course.progress > 0">Continue</span>
-                                    <span v-else>Start Course</span>
+                                    <span v-if="course.progress > 0">{{ __('Continue') }}</span>
+                                    <span v-else>{{ __('Start Course') }}</span>
                                     <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                                 </Link>
                             </div>
@@ -57,7 +57,7 @@ defineProps({
                     </div>
                 </div>
                 <div v-if="courses.length === 0" class="text-center text-gray-500 py-10">
-                    No courses available yet.
+                    {{ __('No courses available yet.') }}
                 </div>
             </div>
         </div>

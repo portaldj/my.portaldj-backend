@@ -27,6 +27,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/feed/{post}/comment', [\App\Http\Controllers\FeedController::class, 'comment'])->name('feed.comment');
     Route::delete('/feed/posts/{post}', [\App\Http\Controllers\FeedController::class, 'destroy'])->name('feed.destroy');
     Route::delete('/feed/comments/{comment}', [\App\Http\Controllers\FeedController::class, 'destroyComment'])->name('feed.comments.destroy');
+    Route::get('/feed/posts/{post}/comments', [\App\Http\Controllers\FeedController::class, 'getComments'])->name('feed.comments.index');
 
     Route::get('/pool', function (App\Services\PoolService $poolService) {
         // Check PRO Access
@@ -39,6 +40,25 @@ Route::middleware(['auth', 'verified'])->group(function () {
             'songs' => $poolService->searchSongs(request()->all())
         ]);
     })->name('pool');
+
+    Route::get('/pool/download/{song}', function ($songId, App\Services\PoolService $poolService) {
+        try {
+            $song = $poolService->downloadSong(request()->user(), $songId);
+
+            $path = \Illuminate\Support\Facades\Storage::disk('public')->path($song->file_path);
+
+            // Get extension from original file
+            $extension = pathinfo($song->file_path, PATHINFO_EXTENSION);
+            $filename = $song->track_name . '.' . $extension;
+
+            // Sanitize filename
+            $filename = preg_replace('/[^a-zA-Z0-9\-\_\.]/', '_', $filename);
+
+            return response()->download($path, $filename);
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    })->name('pool.download');
 
     Route::get('/academy', function (App\Services\AcademyService $academyService) {
         $academyIsPro = \App\Models\Setting::where('key', 'academy_is_pro')->value('value') === '1';

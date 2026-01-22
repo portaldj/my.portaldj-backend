@@ -31,28 +31,59 @@ class PoolService
             $query->where('bpm', '<=', $filters['bpm_max']);
         }
 
-        return $query->paginate($perPage);
+        // Visibility Filter
+        $query->where(function ($q) {
+            $q->whereNull('visible_from')->orWhere('visible_from', '<=', now());
+        })->where(function ($q) {
+            $q->whereNull('visible_until')->orWhere('visible_until', '>=', now());
+        });
+
+        $query->withCount([
+            'downloads as user_downloads_count' => function ($q) {
+                $q->where('user_id', auth()->id());
+            }
+        ]);
+
+        $paginator = $query->paginate($perPage);
+
+        // Append limit to collection (or share via props globally, but simpler to just know the limit)
+        // We can't easily append to paginator meta without transforming. 
+        // Let's rely on sharing the 'limit' via Inertia in web.php or hardcoding/fetching.
+        // Better: Share 'limit' in the Inertia response in web.php.
+
+        return $paginator;
     }
 
     public function downloadSong(User $user, int $songId)
     {
         $song = Song::findOrFail($songId);
 
+        // Check visibility
+        if (
+            ($song->visible_from && $song->visible_from > now()) ||
+            ($song->visible_until && $song->visible_until < now())
+        ) {
+            abort(404, 'Song not available.');
+        }
+
         // Check subscription logic here (e.g. if user is PRO)
         if (!$user->can('download songs') && $song->is_pro_only) {
             abort(403, 'Subscription required to download PRO songs.');
         }
 
-        // Check limits (2 per song per user)
+        // Check limits
+        // Use Song specific limit (default 2 from DB)
+        $limit = $song->download_limit;
+
         $downloadCount = $user->downloads()->where('song_id', $songId)->count();
-        if ($downloadCount >= 2) {
+        if ($downloadCount >= $limit) {
             abort(403, 'Download limit reached for this track.');
         }
 
         // Record download
         $user->downloads()->create(['song_id' => $songId]);
 
-        // Return path for download response
-        return Storage::path($song->file_path); // Or return direct URL if CDN
+        // Return valid song
+        return $song;
     }
 }

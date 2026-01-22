@@ -25,7 +25,7 @@ const submitExam = () => {
     <AuthenticatedLayout>
         <template #header>
             <h2 class="text-xl font-semibold leading-tight text-white">
-                Exam: {{ exam.title }}
+                {{ __('Exam') }}: {{ exam.title }}
             </h2>
         </template>
 
@@ -59,7 +59,7 @@ const submitExam = () => {
                                 :disabled="form.processing"
                                 class="px-6 py-2 bg-gradient-to-r from-brand-primary to-brand-secondary text-white font-bold rounded shadow hover:opacity-90 transition disabled:opacity-50"
                             >
-                                Submit Exam
+                                {{ __('Submit Exam') }}
                             </button>
                         </div>
                     </form>

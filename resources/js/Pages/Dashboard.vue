@@ -130,7 +130,17 @@ const activeCommentInput = ref({});
 const commentForms = ref({}); 
 
 const toggleLike = (post) => {
-    router.post(route('feed.like', post.id), {}, { preserveScroll: true });
+    // Optimistic Update
+    const wasLiked = post.is_liked;
+    post.is_liked = !wasLiked;
+    post.likes_count += post.is_liked ? 1 : -1;
+
+    axios.post(route('feed.like', post.id))
+        .catch(() => {
+            // Revert on failure
+            post.is_liked = wasLiked;
+            post.likes_count += post.is_liked ? 1 : -1;
+        });
 };
 
 const toggleCommentInput = (post) => {
@@ -141,13 +151,24 @@ const submitComment = (post) => {
     const content = commentForms.value[post.id];
     if (!content) return;
 
-    router.post(route('feed.comment', post.id), { content }, {
-        preserveScroll: true,
-        onSuccess: () => {
+    axios.post(route('feed.comment', post.id), { content })
+        .then(response => {
+            // Add comment to list (Top)
+            if (!post.comments) post.comments = [];
+            post.comments.unshift(response.data.comment);
+            post.comments_count++;
+            
+            // Clear form
             commentForms.value[post.id] = '';
-            activeCommentInput.value[post.id] = false; 
-        }
-    });
+            activeCommentInput.value[post.id] = false;
+            
+            // Optional: Show toast? AuthenticatedLayout handles flash messages, but this is axios.
+            // We could manually trigger a toast if we exposed that method, but for now silent success is fine.
+        })
+        .catch(error => {
+            console.error(error);
+            alert('Failed to post comment.');
+        });
 };
 
 const canDelete = (item) => {
@@ -156,12 +177,56 @@ const canDelete = (item) => {
 
 const deletePost = (post) => {
     if (!confirm('Are you sure you want to delete this post?')) return;
-    router.delete(route('feed.destroy', post.id), { preserveScroll: true });
+    
+    axios.delete(route('feed.destroy', post.id))
+        .then(() => {
+            // Remove from array
+            allPosts.value = allPosts.value.filter(p => p.id !== post.id);
+        })
+        .catch(error => {
+            console.error(error);
+            alert('Failed to delete post.');
+        });
 };
 
-const deleteComment = (comment) => {
+const deleteComment = (post, comment) => {
     if (!confirm('Are you sure you want to delete this comment?')) return;
-    router.delete(route('feed.comments.destroy', comment.id), { preserveScroll: true });
+    
+    axios.delete(route('feed.comments.destroy', comment.id))
+        .then(() => {
+             post.comments = post.comments.filter(c => c.id !== comment.id);
+             post.comments_count--;
+        })
+        .catch(error => {
+             console.error(error);
+             alert('Failed to delete comment.');
+        });
+};
+
+const loadMoreComments = (post) => {
+    // Current count or page?
+    // We already have some comments.
+    // If we use simple paging from Laravel, passing ?page=X will work.
+    // Default 5 loaded.
+    // If length is 5, we need page 2.
+    // Length 10 -> page 3.
+    const currentCount = post.comments.length;
+    const page = Math.floor(currentCount / 5) + 1;
+    
+    axios.get(route('feed.comments.index', { post: post.id, page: page }))
+        .then(response => {
+             const newComments = response.data.data;
+             // Ensure unique before adding
+             const existingIds = new Set(post.comments.map(c => c.id));
+             newComments.forEach(c => {
+                 if (!existingIds.has(c.id)) {
+                     post.comments.push(c);
+                 }
+             });
+        })
+        .catch(err => {
+            console.error('Failed to load comments', err);
+        });
 };
 </script>
 
@@ -317,14 +382,23 @@ const deleteComment = (comment) => {
                                 {{ user.name.charAt(0) }}
                             </div>
                             <div class="flex-1">
-                                <form @submit.prevent="submitComment(post)">
+                                <form @submit.prevent="submitComment(post)" class="relative">
                                     <input 
                                         v-model="commentForms[post.id]" 
                                         type="text" 
-                                        class="w-full bg-gray-900 border border-gray-700 rounded-full px-4 py-2 text-sm text-gray-200 focus:ring-brand-accent focus:border-brand-accent"
-                                        placeholder="Write a comment..."
+                                        class="w-full bg-gray-900 border border-gray-700 rounded-full pl-4 pr-10 py-2 text-sm text-gray-200 focus:ring-brand-accent focus:border-brand-accent transition-colors"
+                                        :placeholder="__('Write a comment...')"
                                         required
                                     >
+                                    <button 
+                                        type="submit"
+                                        class="absolute right-1 top-1/2 -translate-y-1/2 p-1.5 text-brand-primary hover:text-brand-accent hover:bg-gray-800 rounded-full transition-colors flex items-center justify-center"
+                                        title="Send Comment"
+                                    >
+                                        <svg class="w-4 h-4 transform rotate-90" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                                        </svg>
+                                    </button>
                                 </form>
                             </div>
                         </div>
@@ -337,13 +411,18 @@ const deleteComment = (comment) => {
                             </div>
                             <div class="flex-1 bg-gray-800 rounded-lg px-4 py-2 relative">
                                 <div class="flex justify-between items-center">
-                                    <span class="text-sm font-bold text-white">{{ comment.user.name }}</span>
+                                    <Link 
+                                        :href="route('profile.show', comment.user.profile?.username || comment.user.id)" 
+                                        class="text-sm font-bold text-white hover:text-brand-accent hover:underline"
+                                    >
+                                        {{ comment.user.name }}
+                                    </Link>
                                     <div class="flex items-center gap-2">
                                         <span class="text-xs text-gray-500">{{ new Date(comment.created_at).toLocaleDateString() }}</span>
                                         <!-- Delete Comment Button -->
                                         <button 
                                             v-if="canDelete(comment)" 
-                                            @click="deleteComment(comment)"
+                                            @click="deleteComment(post, comment)"
                                             class="text-gray-600 hover:text-red-500 transition opacity-0 group-hover/comment:opacity-100"
                                             title="Delete Comment"
                                         >
@@ -355,6 +434,13 @@ const deleteComment = (comment) => {
                                 </div>
                                 <p class="text-sm text-gray-300 mt-1">{{ comment.content }}</p>
                             </div>
+                        </div>
+
+                        <!-- Load More Comments Button -->
+                        <div v-if="post.comments_count > post.comments.length" class="text-center pt-2">
+                             <button @click="loadMoreComments(post)" class="text-sm text-brand-accent hover:underline">
+                                 {{ __('Load more comments') }}
+                             </button>
                         </div>
                     </div>
                 </div>

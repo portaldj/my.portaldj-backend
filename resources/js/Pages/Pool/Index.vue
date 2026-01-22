@@ -1,7 +1,6 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head } from '@inertiajs/vue3';
-
+import { Head, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
 const props = defineProps({
@@ -23,6 +22,19 @@ const togglePlay = (song) => {
         currentSong.value = song;
         // Audio element will auto-play due to autoplay attribute when src changes
     }
+};
+
+const downloadSong = (song) => {
+    // Optimistic UI update
+    song.user_downloads_count++;
+    
+    window.location.href = route('pool.download', song.id);
+};
+
+const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString();
 };
 </script>
 
@@ -60,6 +72,9 @@ const togglePlay = (song) => {
                                     <div>
                                         <h3 class="font-bold text-lg text-brand-accent">{{ song.track_name }}</h3>
                                         <p class="text-sm text-gray-400">{{ song.artist_name }} • {{ song.bpm }} BPM</p>
+                                        <p v-if="song.visible_until" class="text-xs text-red-400 mt-1">
+                                            Available until: {{ formatDate(song.visible_until) }}
+                                        </p>
                                     </div>
                                 </div>
                                 
@@ -76,7 +91,12 @@ const togglePlay = (song) => {
                                         </a>
                                     </template>
                                     <template v-else>
-                                        <div class="flex space-x-2">
+                                        <div class="flex items-center space-x-2">
+                                            <div class="text-xs text-gray-500 mr-2 flex flex-col items-end">
+                                               <span>Downloads: {{ song.user_downloads_count }} / {{ song.download_limit }}</span>
+                                               <span v-if="song.user_downloads_count >= song.download_limit" class="text-red-500 font-bold">Limit Reached</span>
+                                            </div>
+
                                             <a 
                                                 v-if="song.download_url"
                                                 :href="song.download_url" 
@@ -86,13 +106,13 @@ const togglePlay = (song) => {
                                             >
                                                 Alt DL
                                             </a>
-                                            <a 
-                                                :href="song.file_path ? `/storage/${song.file_path}` : '#'" 
-                                                :download="song.track_name"
-                                                class="px-4 py-2 bg-brand-primary rounded hover:bg-violet-500 transition text-white text-sm font-bold"
+                                            <button 
+                                                @click="downloadSong(song)"
+                                                :disabled="song.user_downloads_count >= song.download_limit"
+                                                class="px-4 py-2 bg-brand-primary rounded transition text-white text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-violet-500"
                                             >
                                                 Download
-                                            </a>
+                                            </button>
                                         </div>
                                     </template>
                                 </div>
@@ -107,9 +127,10 @@ const togglePlay = (song) => {
                                     <div class="text-gray-400">{{ currentSong.artist_name }}</div>
                                 </div>
                             </div>
+                            <!-- Prefer preview file, fallback to main file -->
                             <audio 
                                 ref="audioPlayer" 
-                                :src="currentSong.file_path || '#'" 
+                                :src="currentSong.preview_file_path ? `/storage/${currentSong.preview_file_path}` : (currentSong.file_path ? `/storage/${currentSong.file_path}` : '#')" 
                                 controls 
                                 autoplay 
                                 class="w-1/2"

@@ -14,9 +14,21 @@ class Song extends Model
         'remix_type',
         'genre_id',
         'file_path',
+        'preview_file_path',
         'download_url',
-        'is_pro_only'
+        'is_pro_only',
+        'visible_from',
+        'visible_until',
+        'download_limit',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'visible_from' => 'datetime',
+            'visible_until' => 'datetime',
+        ];
+    }
 
     public function genre()
     {

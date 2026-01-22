@@ -78,7 +78,7 @@ class ProfileController extends Controller
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', \Illuminate\Validation\Rule::unique(User::class)->ignore($request->user()->id)],
 
             // Add other fields
-            'username' => ['required', 'string', 'max:255', \Illuminate\Validation\Rule::unique('profiles')->ignore($request->user()->profile->id ?? null)],
+            'username' => ['required', 'string', 'max:255', \Illuminate\Validation\Rule::unique('profiles')->ignore($request->user()->profile->id ?? null), 'regex:/^[a-zA-Z0-9._]+$/'],
             'phone' => ['nullable', 'string', 'max:20'],
             'is_email_public' => ['boolean'],
             'is_phone_public' => ['boolean'],

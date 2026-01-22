@@ -35,13 +35,22 @@ class MusicController extends Controller
             'remix_type' => 'nullable|string|max:50',
             'genre_id' => 'required|exists:music_genres,id',
             'is_pro_only' => 'boolean',
+            'visible_from' => 'nullable|date',
+            'visible_until' => 'nullable|date|after_or_equal:visible_from',
+            'download_limit' => 'required|integer|min:1',
             'file' => 'required|file|mimes:mp3,wav|max:20480', // 20MB max
             'download_url' => 'nullable|url|max:255',
+            'preview_file' => 'nullable|file|mimes:mp3,wav|max:10240', // 10MB max for preview
         ]);
 
         if ($request->hasFile('file')) {
             $path = $request->file('file')->store('songs', 'public');
             $validated['file_path'] = $path;
+        }
+
+        if ($request->hasFile('preview_file')) {
+            $path = $request->file('preview_file')->store('songs/previews', 'public');
+            $validated['preview_file_path'] = $path;
         }
 
         Song::create($validated);
@@ -67,8 +76,12 @@ class MusicController extends Controller
             'remix_type' => 'nullable|string|max:50',
             'genre_id' => 'required|exists:music_genres,id',
             'is_pro_only' => 'boolean',
+            'visible_from' => 'nullable|date',
+            'visible_until' => 'nullable|date|after_or_equal:visible_from',
+            'download_limit' => 'required|integer|min:1',
             'file' => 'nullable|file|mimes:mp3,wav|max:20480', // 20MB max
             'download_url' => 'nullable|url|max:255',
+            'preview_file' => 'nullable|file|mimes:mp3,wav|max:10240', // 10MB max
         ]);
 
         if ($request->hasFile('file')) {
@@ -79,6 +92,16 @@ class MusicController extends Controller
             // Upload new file
             $path = $request->file('file')->store('songs', 'public');
             $validated['file_path'] = $path;
+        }
+
+        if ($request->hasFile('preview_file')) {
+            // Delete old preview
+            if ($song->preview_file_path && Storage::disk('public')->exists($song->preview_file_path)) {
+                Storage::disk('public')->delete($song->preview_file_path);
+            }
+            // Upload new preview
+            $path = $request->file('preview_file')->store('songs/previews', 'public');
+            $validated['preview_file_path'] = $path;
         }
 
         $song->update($validated);

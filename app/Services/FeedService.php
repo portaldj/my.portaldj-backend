@@ -62,7 +62,7 @@ class FeedService
      */
     public function getGlobalFeed(int $perPage = 10)
     {
-        return Post::with(['user.profile', 'comments.user.profile', 'taggedClubs', 'taggedCities', 'taggedDjs'])
+        $feed = Post::with(['user.profile', 'taggedClubs', 'taggedCities', 'taggedDjs'])
             ->withCount(['likes', 'comments'])
             ->withExists([
                 'likes as is_liked' => function ($query) {
@@ -71,6 +71,18 @@ class FeedService
             ])
             ->latest()
             ->paginate($perPage);
+
+        // Manually load top 5 comments for each post to avoid N+1 full load or complex subqueries
+        $feed->getCollection()->each(function ($post) {
+            $post->setRelation('comments', $post->comments()
+                ->with('user.profile')
+                ->latest()
+                ->limit(5)
+                ->get());
+        });
+
+        return $feed;
+
     }
 
     /**
