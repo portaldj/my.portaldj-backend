@@ -16,10 +16,80 @@ const isAdmin = computed(() => user.roles.includes('Admin'));
 
 const placeholderKey = ref('whats_spinning_1');
 
+// Infinite Scroll State
+const allPosts = ref(props.posts.data);
+const loadMoreSentinel = ref(null);
+const isLoadingMore = ref(false);
+const nextUrl = ref(props.posts.next_page_url);
+
 onMounted(() => {
     const randomNum = Math.floor(Math.random() * 5) + 1;
     placeholderKey.value = `whats_spinning_${randomNum}`;
+
+    // Intersection Observer for Infinite Scroll
+    const observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && nextUrl.value && !isLoadingMore.value) {
+            loadMorePosts();
+        }
+    }, { rootMargin: '200px' });
+
+    if (loadMoreSentinel.value) {
+        observer.observe(loadMoreSentinel.value);
+    }
 });
+
+const loadMorePosts = () => {
+    if (isLoadingMore.value || !nextUrl.value) return;
+    
+    isLoadingMore.value = true;
+    axios.get(nextUrl.value)
+        .then(response => {
+            // response.data will have props.posts (Inertia paginated object)
+            // But wait, standard axios call to Inertia endpoint returns HTML/Inertia Object stuff unless we ask for json?
+            // Actually, we should use router.visit with preserveState: true and onSuccess: ... 
+            // BUT typical "Load More" appends data. Reloading the whole page via Inertia replaces props.
+            // A dedicated API endpoint or specific header is better for just data.
+            // Inertia "partial reload" (only: ['posts']) + preserveState: true works if we merge manually.
+            
+            // Re-think: Using axios to hit the same URL returns full page HTML by default if not X-Inertia. 
+            // BUT if we use simple axios we must handle the response format.
+            // EASIEST WAY: Use router.reload with `only: ['posts']` and merge in prop watcher?
+            // No, that replaces `posts` prop.
+            
+            // Standard Inertia Infinite Scroll Pattern:
+            // 1. Visit next_page_url using router.
+            // 2. preserveState: true, preserveScroll: true, only: ['posts'].
+            // 3. In `onSuccess`, we get the new `posts` prop. 
+            // 4. BUT, we need to APPEND, not REPLACE.
+            // 5. So we need to keep `allPosts` separate from `props.posts`.
+            
+            // Let's use axios for simplicity to fetch JSON data if we can, 
+            // OR use Inertia's `when` partial data if we were fancier.
+            // Actually, querying the same route with `axios.get(url, { headers: { 'X-Inertia': true, 'X-Inertia-Partial-Data': 'posts', 'X-Inertia-Partial-Component': 'Dashboard' } })` 
+            // returns the Inertia JSON object.
+            
+            return axios.get(nextUrl.value, {
+                headers: {
+                    'X-Inertia': 'true',
+                    'X-Inertia-Partial-Data': 'posts',
+                    'X-Inertia-Partial-Component': 'Dashboard',
+                    'X-Inertia-Version': usePage().version, // technically optional but good practice
+                }
+            });
+        })
+        .then(res => {
+            const newPostsData = res.data.props.posts;
+            allPosts.value = [...allPosts.value, ...newPostsData.data];
+            nextUrl.value = newPostsData.next_page_url;
+        })
+        .catch(err => {
+            console.error("Failed to load more posts", err);
+        })
+        .finally(() => {
+            isLoadingMore.value = false;
+        });
+};
+
 
 const postForm = useForm({
     content: '',
@@ -30,7 +100,20 @@ const postForm = useForm({
 const submitPost = () => {
     postForm.post(route('feed.store'), {
         forceFormData: true,
-        onSuccess: () => postForm.reset(),
+        onSuccess: () => {
+             postForm.reset();
+             // Manually add the new post to the top of the list if it's visible in the "fresh" posts data
+             // OR simpler: since Inertia reloads the page on success (full visit), props.posts is updated.
+             // We just need to watch props.posts? 
+             // CAUTION: existing infinite scroll items might validly disappear if we blindly reset to props.posts.
+             // BETTER: Just prepend the new post if we can gets it. 
+             // Actually, `post` response doesn't return the new post unless we redirect back with data.
+             
+             // Simplest Approach: Reset `allPosts` to `props.posts.data` (the first page) and let user scroll down again.
+             // This ensures consistency.
+             allPosts.value = props.posts.data;
+             nextUrl.value = props.posts.next_page_url; 
+        },
     });
 };
 
@@ -150,7 +233,7 @@ const deleteComment = (comment) => {
                 </div>
 
                 <!-- Posts List -->
-                <div v-for="post in posts.data" :key="post.id" class="bg-brand-surface p-6 rounded-lg shadow-lg border border-gray-700 relative group">
+                <div v-for="post in allPosts" :key="post.id" class="bg-brand-surface p-6 rounded-lg shadow-lg border border-gray-700 relative group">
                     <!-- Post Header -->
                     <div class="flex justify-between items-start mb-4">
                         <div class="flex items-center space-x-3">
@@ -277,8 +360,13 @@ const deleteComment = (comment) => {
                 </div>
 
 
-                <div v-if="posts.data.length === 0" class="text-center text-gray-500">
+                <div v-if="allPosts.length === 0" class="text-center text-gray-500">
                     No posts yet. Be the first to share!
+                </div>
+                
+                <!-- Infinite Scroll Loading Trigger -->
+                <div ref="loadMoreSentinel" class="h-10 flex justify-center items-center">
+                    <div v-if="isLoadingMore" class="animate-spin rounded-full h-6 w-6 border-b-2 border-brand-accent"></div>
                 </div>
             </div>
         </div>

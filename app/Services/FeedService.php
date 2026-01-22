@@ -60,7 +60,7 @@ class FeedService
     /**
      * Get global feed
      */
-    public function getGlobalFeed(int $perPage = 20)
+    public function getGlobalFeed(int $perPage = 10)
     {
         return Post::with(['user.profile', 'comments.user.profile', 'taggedClubs', 'taggedCities', 'taggedDjs'])
             ->withCount(['likes', 'comments'])

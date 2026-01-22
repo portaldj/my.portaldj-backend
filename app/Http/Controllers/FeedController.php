@@ -25,6 +25,9 @@ class FeedController extends Controller
             'image' => 'nullable|image|max:5120', // 5MB
             'location_tag_type' => 'nullable|string|in:club,user,city',
             'location_tag_id' => 'nullable|integer',
+            'tags' => 'nullable|array',
+            'tags.*.id' => 'required|integer',
+            'tags.*.type' => 'required|string|in:club,city,user',
         ]);
 
         $this->feedService->createPost($request->user(), $validated);
