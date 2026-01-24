@@ -8,9 +8,17 @@ use App\Models\Experience;
 use App\Models\SocialNetwork;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use App\Services\ImageOptimizationService;
 
 class ProfileService
 {
+    protected $imageService;
+
+    public function __construct(ImageOptimizationService $imageService)
+    {
+        $this->imageService = $imageService;
+    }
+
     /**
      * Update or Create Profile for a User
      */
@@ -19,8 +27,19 @@ class ProfileService
         return DB::transaction(function () use ($user, $data) {
             // Handle Image Upload
             if (isset($data['profile_image']) && $data['profile_image'] instanceof \Illuminate\Http\UploadedFile) {
-                $path = $data['profile_image']->store('profiles', 'public');
-                $data['profile_image_path'] = $path;
+                // Resize: thumb (150), medium (500)
+                $variants = [
+                    'thumb' => [150, 150],
+                    'medium' => [500, 500]
+                ];
+
+                $images = $this->imageService->handle($data['profile_image'], 'profiles', $variants);
+                $data['profile_image_path'] = $images['original']; // Store original (optimized) path as main
+
+                // Delete old image if exists
+                if ($user->profile && $user->profile->profile_image_path) {
+                    $this->imageService->delete($user->profile->profile_image_path, array_keys($variants));
+                }
             }
 
             // Update Profile Table

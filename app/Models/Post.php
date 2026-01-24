@@ -63,12 +63,34 @@ class Post extends Model
 
         if ($this->relationLoaded('taggedDjs')) {
             foreach ($this->taggedDjs as $dj) {
-                $tags->push(['id' => $dj->id, 'name' => $dj->name, 'type' => 'user']);
+                // Ensure profile is loaded to avoid N+1 if not eager loaded, though we fixed Service
+                $username = $dj->profile ? $dj->profile->username : null;
+                $tags->push(['id' => $dj->id, 'name' => $dj->name, 'type' => 'user', 'username' => $username]);
             }
         }
 
         return $tags;
     }
 
-    protected $appends = ['tags'];
+    public function getImageUrlAttribute()
+    {
+        return $this->image_path
+            ? '/storage/' . $this->image_path
+            : null;
+    }
+
+    public function getOptimizedUrlAttribute()
+    {
+        if (!$this->image_path)
+            return null;
+
+        $info = pathinfo($this->image_path);
+        $path = $info['dirname'] . '/' . $info['filename'] . '_optimized.' . $info['extension'];
+
+        return \Illuminate\Support\Facades\Storage::disk('public')->exists($path)
+            ? '/storage/' . $path
+            : $this->image_url;
+    }
+
+    protected $appends = ['tags', 'image_url', 'optimized_url'];
 }

@@ -27,7 +27,7 @@ const availableCities = computed(() => {
 
 <template>
     <Head :title="__('Welcome')" />
-    <div class="min-h-screen bg-brand-dark text-gray-100">
+    <div class="min-h-screen bg-gray-100 dark:bg-brand-dark text-gray-900 dark:text-gray-100 transition-colors duration-300">
         <!-- Top Navigation (Login/Register) -->
         <nav v-if="canLogin" class="absolute top-0 right-0 p-6 z-50 flex justify-end space-x-4">
             <Link
@@ -106,17 +106,17 @@ const availableCities = computed(() => {
 
         <!-- Latest DJs Grid -->
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-            <h2 class="text-3xl font-bold text-white mb-8 border-l-4 border-brand-accent pl-4">{{ __('Latest Arrivals') }}</h2>
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-8 border-l-4 border-brand-accent pl-4">{{ __('Latest Arrivals') }}</h2>
             
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div v-for="dj in latestDJs" :key="dj.id" class="bg-brand-surface rounded-xl overflow-hidden border border-gray-800 hover:border-brand-accent transition group">
+                <div v-for="dj in latestDJs" :key="dj.id" class="bg-white dark:bg-brand-surface rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800 hover:border-brand-primary dark:hover:border-brand-accent transition group shadow-md dark:shadow-none">
                     <Link :href="route('profile.show', dj.profile?.username || 'unknown')" class="block">
-                        <div class="h-48 bg-gray-800 overflow-hidden relative">
+                        <div class="h-48 bg-gray-200 dark:bg-gray-800 overflow-hidden relative">
                              <img 
                                 :src="dj.profile?.profile_image_path ? '/storage/' + dj.profile.profile_image_path : 'https://ui-avatars.com/api/?name=' + encodeURIComponent(dj.name)" 
                                 class="w-full h-full object-cover group-hover:scale-105 transition duration-500"
                             >
-                            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-gray-900 to-transparent h-20"></div>
+                            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-gray-900/80 to-transparent h-20"></div>
                             <div class="absolute bottom-4 left-4">
                                 <span v-if="dj.profile?.djType" class="px-2 py-1 bg-brand-primary/80 text-white text-xs rounded font-bold uppercase tracking-wider">
                                     {{ dj.profile.djType.name }}
@@ -124,12 +124,12 @@ const availableCities = computed(() => {
                             </div>
                         </div>
                         <div class="p-6">
-                            <h3 class="text-xl font-bold text-white mb-1 group-hover:text-brand-accent transition">{{ dj.name }}</h3>
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-1 group-hover:text-brand-primary dark:group-hover:text-brand-accent transition">{{ dj.name }}</h3>
                             <p class="text-sm text-gray-500 mb-4 flex items-center" v-if="dj.profile?.city">
                                 <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                                 {{ dj.profile.city.name }}, {{ dj.profile.city.country.name }}
                             </p>
-                            <p class="text-gray-400 text-sm line-clamp-2">
+                            <p class="text-gray-600 dark:text-gray-400 text-sm line-clamp-2">
                                 {{ dj.profile?.biography || 'No biography yet.' }}
                             </p>
                         </div>

@@ -19,6 +19,7 @@ class Profile extends Model
         'address',
         'profile_image_path',
         'dj_type_id',
+        'theme',
         'is_email_public',
         'is_phone_public',
     ];
@@ -43,4 +44,42 @@ class Profile extends Model
         return $this->belongsTo(DjType::class);
     }
 
+    public function getProfileImageUrlAttribute()
+    {
+        return $this->profile_image_path
+            ? '/storage/' . $this->profile_image_path
+            : null;
+    }
+
+    public function getThumbUrlAttribute()
+    {
+        if (!$this->profile_image_path)
+            return null;
+
+        $path = $this->getVariantPath($this->profile_image_path, 'thumb');
+
+        return \Illuminate\Support\Facades\Storage::disk('public')->exists($path)
+            ? '/storage/' . $path
+            : $this->profile_image_url;
+    }
+
+    public function getMediumUrlAttribute()
+    {
+        if (!$this->profile_image_path)
+            return null;
+
+        $path = $this->getVariantPath($this->profile_image_path, 'medium');
+
+        return \Illuminate\Support\Facades\Storage::disk('public')->exists($path)
+            ? '/storage/' . $path
+            : $this->profile_image_url;
+    }
+
+    protected function getVariantPath($originalPath, $variant)
+    {
+        $info = pathinfo($originalPath);
+        return $info['dirname'] . '/' . $info['filename'] . '_' . $variant . '.' . $info['extension'];
+    }
+
+    protected $appends = ['profile_image_url', 'thumb_url', 'medium_url'];
 }

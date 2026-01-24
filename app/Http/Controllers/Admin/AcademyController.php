@@ -7,9 +7,17 @@ use App\Models\Course;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Storage;
+use App\Services\ImageOptimizationService;
 
 class AcademyController extends Controller
 {
+    protected $imageService;
+
+    public function __construct(ImageOptimizationService $imageService)
+    {
+        $this->imageService = $imageService;
+    }
+
     public function index()
     {
         return Inertia::render('Admin/Academy/Index', [
@@ -32,8 +40,13 @@ class AcademyController extends Controller
         ]);
 
         if ($request->hasFile('thumbnail')) {
-            $path = $request->file('thumbnail')->store('thumbnails', 'public');
-            $validated['thumbnail_path'] = $path;
+            // Resize: thumb (400x225), optimized (1280x720)
+            $variants = [
+                'thumb' => [400, 225],
+                'optimized' => [1280, 720]
+            ];
+            $images = $this->imageService->handle($request->file('thumbnail'), 'thumbnails', $variants);
+            $validated['thumbnail_path'] = $images['original']; // Store original base path
         }
 
         $course = Course::create($validated);
@@ -60,10 +73,21 @@ class AcademyController extends Controller
         if ($request->hasFile('thumbnail')) {
             // Delete old
             if ($course->thumbnail_path) {
-                Storage::disk('public')->delete($course->thumbnail_path);
+                // Try delete variants based on old path being 'optimized' or 'original'
+                // Since this is a new system, old paths might just be files.
+                // The delete() method in service blindly tries variants.
+                // If the old path was 'path/hash_optimized.jpg', the directory/filename parsing might be tricky if not consistent.
+                // But for new uploads it will work. For legacy files, it just deletes the file.
+                // However, we should pass the keys we expect.
+                $this->imageService->delete($course->thumbnail_path, ['thumb', 'optimized']);
             }
-            $path = $request->file('thumbnail')->store('thumbnails', 'public');
-            $validated['thumbnail_path'] = $path;
+
+            $variants = [
+                'thumb' => [400, 225],
+                'optimized' => [1280, 720]
+            ];
+            $images = $this->imageService->handle($request->file('thumbnail'), 'thumbnails', $variants);
+            $validated['thumbnail_path'] = $images['original'];
         }
 
         $course->update($validated);
@@ -109,7 +133,7 @@ class AcademyController extends Controller
 
         // Delete thumbnail if exists
         if ($course->thumbnail_path) {
-            Storage::disk('public')->delete($course->thumbnail_path);
+            $this->imageService->delete($course->thumbnail_path, ['thumb', 'optimized']);
         }
 
         // Manually delete children to ensuring everything cleans up even if cascade fails

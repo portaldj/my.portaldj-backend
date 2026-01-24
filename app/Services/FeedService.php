@@ -5,9 +5,17 @@ namespace App\Services;
 use App\Models\Post;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use App\Services\ImageOptimizationService;
 
 class FeedService
 {
+    protected $imageService;
+
+    public function __construct(ImageOptimizationService $imageService)
+    {
+        $this->imageService = $imageService;
+    }
+
     /**
      * Create a new post
      */
@@ -19,7 +27,10 @@ class FeedService
         ];
 
         if (isset($data['image']) && $data['image'] instanceof \Illuminate\Http\UploadedFile) {
-            $postData['image_path'] = $data['image']->store('posts', 'public');
+            // Create optimized version (max width 1080, auto height)
+            $variants = ['optimized' => [1080, null]];
+            $images = $this->imageService->handle($data['image'], 'posts', $variants);
+            $postData['image_path'] = $images['original'];
         }
 
         $post = $user->posts()->create($postData);
@@ -62,7 +73,7 @@ class FeedService
      */
     public function getGlobalFeed(int $perPage = 10)
     {
-        $feed = Post::with(['user.profile', 'taggedClubs', 'taggedCities', 'taggedDjs'])
+        $feed = Post::with(['user.profile', 'taggedClubs', 'taggedCities', 'taggedDjs.profile'])
             ->withCount(['likes', 'comments'])
             ->withExists([
                 'likes as is_liked' => function ($query) {
@@ -115,7 +126,7 @@ class FeedService
         }
 
         if ($post->image_path) {
-            \Illuminate\Support\Facades\Storage::disk('public')->delete($post->image_path);
+            $this->imageService->delete($post->image_path, ['optimized']);
         }
 
         $post->delete();

@@ -13,6 +13,13 @@ class Experience extends Model
         'end_date' => 'date',
     ];
 
+    protected $appends = ['is_current'];
+
+    public function getIsCurrentAttribute()
+    {
+        return is_null($this->end_date);
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

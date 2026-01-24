@@ -43,24 +43,24 @@ const formatDate = (dateString) => {
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-white">
+            <h2 class="text-xl font-semibold leading-tight text-gray-800 dark:text-white">
                 Music Pool
             </h2>
         </template>
 
         <div class="py-12">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <div class="overflow-hidden bg-brand-surface shadow-sm sm:rounded-lg border border-gray-700">
-                    <div class="p-6 text-gray-100">
+                <div class="overflow-hidden bg-white dark:bg-brand-surface shadow-sm sm:rounded-lg border border-gray-200 dark:border-gray-700">
+                    <div class="p-6 text-gray-900 dark:text-gray-100">
                         <div v-if="songs.data.length === 0" class="text-center py-10 text-gray-500">
                             No songs found in the pool.
                         </div>
-                        <ul v-else class="divide-y divide-gray-700">
-                            <li v-for="song in songs.data" :key="song.id" class="py-4 flex justify-between items-center">
+                        <ul v-else class="divide-y divide-gray-200 dark:divide-gray-700">
+                            <li v-for="song in songs.data" :key="song.id" class="py-4 flex justify-between items-center transition hover:bg-gray-50 dark:hover:bg-gray-800 px-2 rounded-lg">
                                 <div class="flex items-center space-x-4">
                                     <button 
                                         @click="togglePlay(song)"
-                                        class="h-10 w-10 rounded-full bg-brand-surface border border-brand-primary flex items-center justify-center text-brand-primary hover:bg-brand-primary hover:text-white transition"
+                                        class="h-10 w-10 rounded-full bg-white dark:bg-brand-surface border border-brand-primary flex items-center justify-center text-brand-primary hover:bg-brand-primary hover:text-white transition"
                                     >
                                         <svg v-if="currentSong?.id === song.id && isPlaying" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 01-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 001 1h2a1 1 0 001-1V8a1 1 0 00-1-1h-2z" clip-rule="evenodd" />
@@ -70,9 +70,9 @@ const formatDate = (dateString) => {
                                         </svg>
                                     </button>
                                     <div>
-                                        <h3 class="font-bold text-lg text-brand-accent">{{ song.track_name }}</h3>
-                                        <p class="text-sm text-gray-400">{{ song.artist_name }} • {{ song.bpm }} BPM</p>
-                                        <p v-if="song.visible_until" class="text-xs text-red-400 mt-1">
+                                        <h3 class="font-bold text-lg text-brand-primary dark:text-brand-accent">{{ song.track_name }}</h3>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">{{ song.artist_name }} • {{ song.bpm }} BPM</p>
+                                        <p v-if="song.visible_until" class="text-xs text-red-500 dark:text-red-400 mt-1">
                                             Available until: {{ formatDate(song.visible_until) }}
                                         </p>
                                     </div>
@@ -82,7 +82,7 @@ const formatDate = (dateString) => {
                                     <template v-if="song.is_pro_only && !$page.props.auth.user.is_pro">
                                         <a 
                                             :href="route('subscription.index')" 
-                                            class="px-4 py-2 bg-brand-secondary rounded hover:bg-pink-600 transition text-white text-sm font-bold flex items-center"
+                                            class="px-4 py-2 bg-brand-secondary rounded hover:bg-pink-600 transition text-white text-sm font-bold flex items-center shadow-lg shadow-pink-500/20"
                                         >
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor">
                                                 <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
@@ -101,7 +101,7 @@ const formatDate = (dateString) => {
                                                 v-if="song.download_url"
                                                 :href="song.download_url" 
                                                 target="_blank"
-                                                class="px-4 py-2 bg-gray-700 rounded hover:bg-gray-600 transition text-white text-sm font-bold border border-gray-600"
+                                                class="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition text-gray-800 dark:text-white text-sm font-bold border border-gray-300 dark:border-gray-600"
                                                 title="Alternative Download"
                                             >
                                                 Alt DL
@@ -109,7 +109,7 @@ const formatDate = (dateString) => {
                                             <button 
                                                 @click="downloadSong(song)"
                                                 :disabled="song.user_downloads_count >= song.download_limit"
-                                                class="px-4 py-2 bg-brand-primary rounded transition text-white text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-violet-500"
+                                                class="px-4 py-2 bg-brand-primary rounded transition text-white text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-violet-500 shadow-lg shadow-violet-500/20"
                                             >
                                                 Download
                                             </button>
@@ -120,11 +120,11 @@ const formatDate = (dateString) => {
                         </ul>
                         
                         <!-- Fixed Player Bar -->
-                        <div v-if="currentSong" class="fixed bottom-0 left-0 w-full bg-brand-surface border-t border-gray-700 p-4 flex items-center justify-between z-50 shadow-lg">
+                        <div v-if="currentSong" class="fixed bottom-0 left-0 w-full bg-white dark:bg-brand-surface border-t border-gray-200 dark:border-gray-700 p-4 flex items-center justify-between z-50 shadow-lg">
                             <div class="flex items-center space-x-4">
                                 <div class="text-sm">
-                                    <div class="font-bold text-white">{{ currentSong.track_name }}</div>
-                                    <div class="text-gray-400">{{ currentSong.artist_name }}</div>
+                                    <div class="font-bold text-gray-900 dark:text-white">{{ currentSong.track_name }}</div>
+                                    <div class="text-gray-500 dark:text-gray-400">{{ currentSong.artist_name }}</div>
                                 </div>
                             </div>
                             <!-- Prefer preview file, fallback to main file -->
@@ -138,7 +138,7 @@ const formatDate = (dateString) => {
                                 @pause="isPlaying = false"
                                 @ended="isPlaying = false"
                             ></audio>
-                            <button @click="currentSong = null; isPlaying = false" class="text-gray-400 hover:text-white">
+                            <button @click="currentSong = null; isPlaying = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-white">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                 </svg>

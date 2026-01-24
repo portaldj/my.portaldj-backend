@@ -34,13 +34,13 @@ const formatDate = (dateString) => {
         <meta property="og:type" content="profile" />
         <meta property="og:title" :content="user.name + ' - DJ Profile'" />
         <meta property="og:description" :content="profile.biography ? profile.biography.substring(0, 160) : 'Check out ' + user.name + ' on Portal DJ.'" />
-        <meta property="og:image" :content="profile.profile_image_path ? '/storage/' + profile.profile_image_path : 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.name)" />
+        <meta property="og:image" :content="profile.profile_image_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.name)" />
         
         <!-- Twitter -->
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" :content="user.name + ' - DJ Profile'" />
         <meta name="twitter:description" :content="profile.biography ? profile.biography.substring(0, 160) : 'Check out ' + user.name + ' on Portal DJ.'" />
-        <meta name="twitter:image" :content="profile.profile_image_path ? '/storage/' + profile.profile_image_path : 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.name)" />
+        <meta name="twitter:image" :content="profile.profile_image_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.name)" />
     </Head>
 
     <AuthenticatedLayout>
@@ -52,7 +52,7 @@ const formatDate = (dateString) => {
                 <!-- Profile Image -->
                 <div class="relative group">
                     <img 
-                        :src="profile.profile_image_path ? '/storage/' + profile.profile_image_path : 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.name) + '&color=7F9CF5&background=EBF4FF'" 
+                        :src="profile.medium_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.name) + '&color=7F9CF5&background=EBF4FF'" 
                         alt="Profile" 
                         class="h-40 w-40 rounded-full border-4 border-gray-900 shadow-xl object-cover bg-gray-800"
                     />
@@ -63,11 +63,11 @@ const formatDate = (dateString) => {
 
                 <!-- Basic Info -->
                 <div class="mt-4 md:mt-24 text-center md:text-left flex-1">
-                    <h1 class="text-3xl font-bold text-white">{{ profile.username ? '@' + profile.username : user.name }}</h1>
-                    <p v-if="profile.username" class="text-lg text-gray-400 font-medium">{{ user.name }}</p>
-                    <div class="flex flex-col md:flex-row items-center md:items-start text-gray-400 mt-2 space-y-1 md:space-y-0 md:space-x-4 text-sm">
+                    <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ profile.username ? '@' + profile.username : user.name }}</h1>
+                    <p v-if="profile.username" class="text-lg text-gray-600 dark:text-gray-400 font-medium">{{ user.name }}</p>
+                    <div class="flex flex-col md:flex-row items-center md:items-start text-gray-600 dark:text-gray-400 mt-2 space-y-1 md:space-y-0 md:space-x-4 text-sm">
                         <span v-if="profile.dj_type" class="flex items-center">
-                            <svg class="w-4 h-4 mr-1 text-brand-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path></svg>
+                            <svg class="w-4 h-4 mr-1 text-brand-primary dark:text-brand-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path></svg>
                             {{ profile.dj_type.name }}
                         </span>
                         <span v-if="profile.city" class="flex items-center">
@@ -77,7 +77,7 @@ const formatDate = (dateString) => {
                     </div>
                     
                     <div class="mt-4 flex space-x-3 justify-center md:justify-start">
-                        <a v-for="social in user.social_networks" :key="social.id" :href="social.url.startsWith('http') ? social.url : (social.platform.base_url ? social.platform.base_url + social.url : 'https://' + social.url)" target="_blank" class="text-gray-400 hover:text-white transition">
+                        <a v-for="social in user.social_networks" :key="social.id" :href="social.url.startsWith('http') ? social.url : (social.platform.base_url ? social.platform.base_url + social.url : 'https://' + social.url)" target="_blank" class="text-gray-400 hover:text-brand-primary dark:hover:text-white transition">
                             <div v-if="social.platform && social.platform.icon" v-html="social.platform.icon" class="w-5 h-5 [&>svg]:w-full [&>svg]:h-full [&>svg]:fill-current"></div>
                             <svg v-else class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                                 <path :d="socialIcons.default" />
@@ -98,53 +98,79 @@ const formatDate = (dateString) => {
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-12">
                 <!-- Left Column: Bio & Info -->
                 <div class="space-y-6">
-                    <!-- Biography -->
-                    <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
-                        <h3 class="text-lg font-bold text-white mb-4">{{ __('About') }}</h3>
-                        <p class="text-gray-400 text-sm whitespace-pre-line leading-relaxed">
-                            {{ profile.biography || __('No biography provided yet.') }}
-                        </p>
+                    <!-- About -->
+                    <div class="bg-white dark:bg-brand-surface p-6 rounded-lg shadow border border-gray-200 dark:border-gray-700">
+                        <h3 class="text-xl font-bold mb-4 text-gray-900 dark:text-white flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-brand-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                            {{ __('About') }}
+                        </h3>
+                        <p class="text-gray-600 dark:text-gray-300 whitespace-pre-line">{{ profile.biography || __('No biography provided.') }}</p>
                     </div>
 
                     <!-- Details -->
-                    <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
-                         <h3 class="text-lg font-bold text-white mb-4">{{ __('Details') }}</h3>
-                         <div class="space-y-4">
-                            <div v-if="profile.is_email_public && user.email">
-                                <span class="block text-xs text-gray-500 uppercase font-bold">{{ __('Email') }}</span>
-                                <a :href="'mailto:' + user.email" class="text-gray-300 hover:text-white transition">{{ user.email }}</a>
-                            </div>
-
-                            <div v-if="profile.is_phone_public && profile.phone">
-                                <span class="block text-xs text-gray-500 uppercase font-bold">{{ __('Phone') }}</span>
-                                <span class="text-gray-300">{{ profile.phone }}</span>
-                            </div>
-
-                            <div>
-                                <span class="block text-xs text-gray-500 uppercase font-bold">{{ __('Genres') }}</span>
-                                <div class="flex flex-wrap gap-2 mt-2">
-                                    <span v-for="genre in user.genres" :key="genre.id" class="px-2 py-1 bg-gray-900 rounded text-xs text-brand-primary">
+                    <div class="bg-white dark:bg-brand-surface p-6 rounded-lg shadow border border-gray-200 dark:border-gray-700">
+                         <h3 class="text-xl font-bold mb-4 text-gray-900 dark:text-white flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-brand-accent p-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            {{ __('Details') }}
+                        </h3>
+                        <ul class="space-y-3 text-sm">
+                            <li v-if="profile.is_email_public && user.email" class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
+                                <span class="text-gray-500">{{ __('Email') }}</span>
+                                <a :href="'mailto:' + user.email" class="text-gray-900 dark:text-white font-medium hover:underline">{{ user.email }}</a>
+                            </li>
+                             <li v-if="profile.is_phone_public && profile.phone" class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
+                                <span class="text-gray-500">{{ __('Phone') }}</span>
+                                <span class="text-gray-900 dark:text-white font-medium">{{ profile.phone }}</span>
+                            </li>
+                            <li v-if="profile.country" class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
+                                <span class="text-gray-500">{{ __('Country') }}</span>
+                                <span class="text-gray-900 dark:text-white font-medium">{{ profile.country.name }}</span>
+                            </li>
+                             <li v-if="profile.city" class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
+                                <span class="text-gray-500">{{ __('City') }}</span>
+                                <span class="text-gray-900 dark:text-white font-medium">{{ profile.city.name }}</span>
+                            </li>
+                             <li v-if="profile.dj_type" class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
+                                <span class="text-gray-500">{{ __('DJ Type') }}</span>
+                                <span class="text-gray-900 dark:text-white font-medium">{{ profile.dj_type.name }}</span>
+                            </li>
+                            <!-- Genres -->
+                            <li v-if="user.genres && user.genres.length > 0" class="pt-2">
+                                <span class="block text-gray-500 mb-2">{{ __('Genres') }}</span>
+                                <div class="flex flex-wrap gap-2">
+                                    <span v-for="genre in user.genres" :key="genre.id" class="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-xs text-brand-primary dark:text-brand-accent font-semibold">
                                         {{ genre.name }}
                                     </span>
-                                    <span v-if="(!user.genres || user.genres.length === 0)" class="text-gray-500 text-sm">-</span>
                                 </div>
-                            </div>
-                         </div>
+                            </li>
+                        </ul>
                     </div>
-                    
-                    <!-- Equipment -->
-                    <div class="bg-gray-800 p-6 rounded-lg border border-gray-700" v-if="user.equipment && user.equipment.length > 0">
-                        <h3 class="text-lg font-bold text-white mb-4">{{ __('Setup / Gear') }}</h3>
-                        <div class="space-y-3">
-                            <div v-for="item in user.equipment" :key="item.id" class="flex flex-col border-b border-gray-700 last:border-0 pb-3 last:pb-0">
-                                <div class="flex items-baseline justify-between">
-                                    <span class="text-gray-200 font-medium">
-                                        {{ item.brand?.name || item.equipment_model?.brand?.name }} 
-                                        {{ item.model_name || item.equipment_model?.name }}
-                                        <span v-if="item.equipment_model?.is_verified" class="ml-1 text-[10px] bg-blue-100/10 text-blue-300 px-1 rounded border border-blue-900">{{ __('Verified') }}</span>
-                                    </span>
-                                </div>
-                                <span class="text-xs text-brand-accent mt-1">{{ item.type?.name || item.equipment_model?.type?.name }}</span>
+
+                     <!-- DJ Gear / Setup -->
+                    <div class="bg-white dark:bg-brand-surface p-6 rounded-lg shadow border border-gray-200 dark:border-gray-700" v-if="user.equipment && user.equipment.length > 0">
+                        <h3 class="text-xl font-bold mb-4 text-gray-900 dark:text-white flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-brand-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+                            {{ __('Setup / Gear') }}
+                        </h3>
+                        <div class="space-y-4">
+                             <!-- Equipment List -->
+                            <div v-for="item in user.equipment" :key="item.id" class="flex items-start space-x-3 pb-3 border-b border-gray-100 dark:border-gray-700 last:border-0 last:pb-0">
+                                 <div class="flex-shrink-0 w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded flex items-center justify-center overflow-hidden border border-gray-200 dark:border-gray-600">
+                                     <img v-if="item.image_url" :src="item.image_url" class="w-full h-full object-cover">
+                                     <svg v-else class="w-6 h-6 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path></svg>
+                                 </div>
+                                 <div>
+                                     <h4 class="text-sm font-bold text-gray-900 dark:text-white">
+                                         {{ item.equipment_model ? item.equipment_model.name : item.model_name }}
+                                     </h4>
+                                      <p class="text-xs text-brand-primary dark:text-brand-accent">
+                                          {{ item.type ? item.type.name : (item.equipment_model?.type ? item.equipment_model.type.name : '') }}
+                                      </p>
+                                     <p class="text-xs text-gray-500">
+                                         <span v-if="item.brand" class="mr-1">{{ item.brand.name }}</span>
+                                         <span v-else-if="item.equipment_model?.brand">{{ item.equipment_model.brand.name }}</span>
+                                     </p>
+                                 </div>
                             </div>
                         </div>
                     </div>
@@ -152,31 +178,29 @@ const formatDate = (dateString) => {
 
                 <!-- Right Column: Experience -->
                 <div class="lg:col-span-2 space-y-6">
-                    <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
-                        <h3 class="text-lg font-bold text-white mb-6">{{ __('Experience') }}</h3>
+                    <div>
+                        <h3 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2 inline-block">{{ __('Experience') }}</h3>
                         
-                        <div v-if="user.experiences && user.experiences.length > 0" class="space-y-8 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-300 before:to-transparent">
-                             <div v-for="exp in user.experiences" :key="exp.id" class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                                <!-- Icon -->
-                                <div class="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-slate-300 group-[.is-active]:bg-emerald-500 text-slate-500 group-[.is-active]:text-emerald-50 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2">
-                                    <svg class="fill-current" xmlns="http://www.w3.org/2000/svg" width="12" height="10">
-                                        <path fill-rule="nonzero" d="M10.422 1.257 4.655 7.025 2.553 4.923A.916.916 0 0 0 1.257 6.22l2.75 2.75a.916.916 0 0 0 1.296 0l6.415-6.416a.916.916 0 0 0-1.296-1.296Z" />
-                                    </svg>
-                                </div>
-                                <!-- Content -->
-                                <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-gray-900 p-4 rounded border border-slate-700 shadow">
-                                    <div class="flex items-center justify-between space-x-2 mb-1">
-                                        <div class="font-bold text-slate-200">{{ exp.title }}</div>
-                                        <time class="font-caveat font-medium text-brand-accent">{{ formatDate(exp.start_date) }} - {{ exp.end_date ? formatDate(exp.end_date) : __('Present') }}</time>
-                                    </div>
-                                    <div class="text-slate-400 text-sm mb-2">{{ exp.place }}</div>
-                                    <div class="text-slate-500 text-sm">{{ exp.description }}</div>
+                        <div v-if="user.experiences && user.experiences.length > 0" class="space-y-6 relative border-l-2 border-gray-200 dark:border-gray-700 ml-3 pl-8 pb-4">
+                            <div v-for="exp in user.experiences" :key="exp.id" class="relative">
+                                <span class="absolute -left-10 top-1 bg-brand-primary h-4 w-4 rounded-full border-4 border-gray-100 dark:border-gray-900"></span>
+                                <div class="bg-white dark:bg-brand-surface p-5 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 transition hover:border-brand-primary dark:hover:border-brand-primary">
+                                    <h4 class="text-lg font-bold text-gray-900 dark:text-white">
+                                        {{ exp.title }}
+                                    </h4>
+                                    <p class="text-md text-gray-700 dark:text-gray-300 mb-1">
+                                        {{ exp.place }}
+                                    </p>
+                                    <p class="text-brand-secondary text-sm font-semibold mb-2">
+                                        {{ formatDate(exp.start_date) }} - {{ exp.is_current ? __('Currently working here') : formatDate(exp.end_date) }}
+                                    </p>
+                                    <p class="text-gray-600 dark:text-gray-300 text-sm whitespace-pre-line">{{ exp.description }}</p>
                                 </div>
                             </div>
                         </div>
 
-                        <div v-else class="text-gray-500 text-center py-4">
-                            {{ __('No experience listed.') }}
+                        <div v-else class="text-gray-500 italic bg-gray-50 dark:bg-brand-surface/50 p-6 rounded-lg text-center border border-dashed border-gray-300 dark:border-gray-700">
+                            {{ __('No experience listed yet.') }}
                         </div>
                     </div>
                 </div>
