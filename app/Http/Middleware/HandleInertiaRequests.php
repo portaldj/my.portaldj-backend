@@ -55,6 +55,17 @@ class HandleInertiaRequests extends Middleware
                 $path = base_path("lang/{$locale}.json");
                 return file_exists($path) ? json_decode(file_get_contents($path), true) : [];
             },
+            'modules' => function () {
+                $settings = \App\Models\Setting::whereIn('key', ['module_pool', 'module_academy', 'module_agenda', 'module_assistant'])
+                    ->pluck('value', 'key');
+
+                return [
+                    'pool' => ($settings['module_pool'] ?? '1') !== '0' && ($settings['module_pool'] ?? 'true') !== 'false',
+                    'academy' => ($settings['module_academy'] ?? '1') !== '0' && ($settings['module_academy'] ?? 'true') !== 'false',
+                    'agenda' => ($settings['module_agenda'] ?? '1') !== '0' && ($settings['module_agenda'] ?? 'true') !== 'false',
+                    'assistant' => ($settings['module_assistant'] ?? '1') !== '0' && ($settings['module_assistant'] ?? 'true') !== 'false',
+                ];
+            },
         ];
     }
 }

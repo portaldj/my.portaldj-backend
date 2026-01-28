@@ -44,6 +44,37 @@ class ProfileController extends Controller
         return Inertia::render('Profile/Show', [
             'user' => $user,
             'isOwnProfile' => auth()->id() === $user->id,
+            'events' => $user->events()->where('is_public', true)->get()->map(function ($event) {
+                return [
+                    'id' => $event->id,
+                    'title' => $event->title,
+                    'start' => $event->start,
+                    'end' => $event->end,
+                    'description' => $event->description,
+                    'url' => $event->url,
+                    'className' => 'bg-brand-primary border-brand-primary text-white',
+                    'extendedProps' => [
+                        'description' => $event->description,
+                        'url' => $event->url,
+                    ]
+                ];
+            }),
+            'upcomingEvents' => $user->events()
+                ->where('is_public', true)
+                ->where('start', '>=', now())
+                ->orderBy('start')
+                ->take(3)
+                ->get()
+                ->map(function ($event) {
+                    return [
+                        'id' => $event->id,
+                        'title' => $event->title,
+                        'start' => $event->start,
+                        'end' => $event->end,
+                        'description' => $event->description,
+                        'url' => $event->url,
+                    ];
+                }),
         ]);
     }
 
@@ -74,11 +105,11 @@ class ProfileController extends Controller
         // We use a custom validation here or rely on the service validation if moved there.
         // For simplicity, we can validate here using similar rules as Api\ProfileController
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', \Illuminate\Validation\Rule::unique(User::class)->ignore($request->user()->id)],
+            'name' => ['sometimes', 'required', 'string', 'max:255'],
+            'email' => ['sometimes', 'required', 'string', 'lowercase', 'email', 'max:255', \Illuminate\Validation\Rule::unique(User::class)->ignore($request->user()->id)],
 
             // Add other fields
-            'username' => ['required', 'string', 'max:255', \Illuminate\Validation\Rule::unique('profiles')->ignore($request->user()->profile->id ?? null), 'regex:/^[a-zA-Z0-9._]+$/'],
+            'username' => ['sometimes', 'required', 'string', 'max:255', \Illuminate\Validation\Rule::unique('profiles')->ignore($request->user()->profile->id ?? null), 'regex:/^[a-zA-Z0-9._]+$/'],
             'phone' => ['nullable', 'string', 'max:20'],
             'is_email_public' => ['boolean'],
             'is_phone_public' => ['boolean'],
@@ -103,11 +134,17 @@ class ProfileController extends Controller
             'openai_key' => ['nullable', 'string'],
             'gemini_key' => ['nullable', 'string'],
             'locale' => ['nullable', 'string', 'in:en,es'],
+            'theme' => ['nullable', 'string', 'in:light,dark,system'],
         ]);
 
+        if (isset($validated['name'])) {
+            $request->user()->name = $validated['name'];
+        }
+        if (isset($validated['email'])) {
+            $request->user()->email = $validated['email'];
+        }
+
         $request->user()->fill([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
             'openai_key' => $validated['openai_key'] ?? $request->user()->openai_key,
             'gemini_key' => $validated['gemini_key'] ?? $request->user()->gemini_key,
             'locale' => $validated['locale'] ?? $request->user()->locale,

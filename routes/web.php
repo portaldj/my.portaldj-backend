@@ -29,82 +29,86 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/feed/comments/{comment}', [\App\Http\Controllers\FeedController::class, 'destroyComment'])->name('feed.comments.destroy');
     Route::get('/feed/posts/{post}/comments', [\App\Http\Controllers\FeedController::class, 'getComments'])->name('feed.comments.index');
 
-    Route::get('/pool', function (App\Services\PoolService $poolService) {
-        // Check PRO Access
-        $poolIsPro = \App\Models\Setting::where('key', 'pool_is_pro')->value('value') === '1';
-        if ($poolIsPro && !auth()->user()->is_pro) {
-            return redirect()->route('subscription.index')->with('message', 'The Music Pool is for PRO members only.');
-        }
-
-        return Inertia::render('Pool/Index', [
-            'songs' => $poolService->searchSongs(request()->all())
-        ]);
-    })->name('pool');
-
-    Route::get('/pool/download/{song}', function ($songId, App\Services\PoolService $poolService) {
-        try {
-            $song = $poolService->downloadSong(request()->user(), $songId);
-
-            $path = \Illuminate\Support\Facades\Storage::disk('public')->path($song->file_path);
-
-            // Get extension from original file
-            $extension = pathinfo($song->file_path, PATHINFO_EXTENSION);
-            $filename = $song->track_name . '.' . $extension;
-
-            // Sanitize filename
-            $filename = preg_replace('/[^a-zA-Z0-9\-\_\.]/', '_', $filename);
-
-            return response()->download($path, $filename);
-        } catch (\Exception $e) {
-            return back()->with('error', $e->getMessage());
-        }
-    })->name('pool.download');
-
-    Route::get('/academy', function (App\Services\AcademyService $academyService) {
-        $academyIsPro = \App\Models\Setting::where('key', 'academy_is_pro')->value('value') === '1';
-        if ($academyIsPro && !auth()->user()->is_pro) {
-            return redirect()->route('subscription.index')->with('message', 'The Academy is for PRO members only.');
-        }
-
-        return Inertia::render('Academy/Index', [
-            'courses' => $academyService->getAllCourses()
-        ]);
-    })->name('academy');
-
-    Route::get('/academy/{course}', function ($courseId, App\Services\AcademyService $academyService) {
-        $academyIsPro = \App\Models\Setting::where('key', 'academy_is_pro')->value('value') === '1';
-        $course = \App\Models\Course::findOrFail($courseId);
-
-        if (!auth()->user()->is_pro) {
-            if ($academyIsPro || $course->is_pro) {
-                return redirect()->route('subscription.index')->with('message', 'This course is for PRO members only.');
+    Route::middleware(['module:pool'])->group(function () {
+        Route::get('/pool', function (App\Services\PoolService $poolService) {
+            // Check PRO Access
+            $poolIsPro = \App\Models\Setting::where('key', 'pool_is_pro')->value('value') === '1';
+            if ($poolIsPro && !auth()->user()->is_pro) {
+                return redirect()->route('subscription.index')->with('message', 'The Music Pool is for PRO members only.');
             }
-        }
 
-        return Inertia::render('Academy/Show', [
-            'course' => $academyService->getCourseDetails($courseId)
-        ]);
-    })->name('academy.show');
+            return Inertia::render('Pool/Index', [
+                'songs' => $poolService->searchSongs(request()->all())
+            ]);
+        })->name('pool');
 
-    Route::get('/academy/exam/{exam}', function ($examId) {
-        return Inertia::render('Academy/Exam', [
-            'exam' => \App\Models\Exam::with('questions.answers')->findOrFail($examId)
-        ]);
-    })->name('academy.exam');
+        Route::get('/pool/download/{song}', function ($songId, App\Services\PoolService $poolService) {
+            try {
+                $song = $poolService->downloadSong(request()->user(), $songId);
 
-    Route::post('/academy/exam/{exam}/submit', function ($examId, \Illuminate\Http\Request $request, App\Services\AcademyService $academyService) {
-        $result = $academyService->submitExam($request->user(), $examId, $request->input('answers', []));
+                $path = \Illuminate\Support\Facades\Storage::disk('public')->path($song->file_path);
 
-        // Return to course or show result
-        // For now, redirect back with flash message
-        return redirect()->route('academy.show', $result->exam->chapter->course_id)
-            ->with('success', $result->passed ? 'You passed the exam!' : 'You failed. Try again.');
-    })->name('academy.submit');
+                // Get extension from original file
+                $extension = pathinfo($song->file_path, PATHINFO_EXTENSION);
+                $filename = $song->track_name . '.' . $extension;
 
-    Route::post('/academy/chapters/{chapter}/complete', function (\App\Models\Chapter $chapter, \Illuminate\Http\Request $request, App\Services\AcademyService $academyService) {
-        $academyService->markChapterComplete($request->user(), $chapter->id);
-        return back(); // Inertia will reload props
-    })->name('academy.chapters.complete');
+                // Sanitize filename
+                $filename = preg_replace('/[^a-zA-Z0-9\-\_\.]/', '_', $filename);
+
+                return response()->download($path, $filename);
+            } catch (\Exception $e) {
+                return back()->with('error', $e->getMessage());
+            }
+        })->name('pool.download');
+    });
+
+    Route::middleware(['module:academy'])->group(function () {
+        Route::get('/academy', function (App\Services\AcademyService $academyService) {
+            $academyIsPro = \App\Models\Setting::where('key', 'academy_is_pro')->value('value') === '1';
+            if ($academyIsPro && !auth()->user()->is_pro) {
+                return redirect()->route('subscription.index')->with('message', 'The Academy is for PRO members only.');
+            }
+
+            return Inertia::render('Academy/Index', [
+                'courses' => $academyService->getAllCourses()
+            ]);
+        })->name('academy');
+
+        Route::get('/academy/{course}', function ($courseId, App\Services\AcademyService $academyService) {
+            $academyIsPro = \App\Models\Setting::where('key', 'academy_is_pro')->value('value') === '1';
+            $course = \App\Models\Course::findOrFail($courseId);
+
+            if (!auth()->user()->is_pro) {
+                if ($academyIsPro || $course->is_pro) {
+                    return redirect()->route('subscription.index')->with('message', 'This course is for PRO members only.');
+                }
+            }
+
+            return Inertia::render('Academy/Show', [
+                'course' => $academyService->getCourseDetails($courseId)
+            ]);
+        })->name('academy.show');
+
+        Route::get('/academy/exam/{exam}', function ($examId) {
+            return Inertia::render('Academy/Exam', [
+                'exam' => \App\Models\Exam::with('questions.answers')->findOrFail($examId)
+            ]);
+        })->name('academy.exam');
+
+        Route::post('/academy/exam/{exam}/submit', function ($examId, \Illuminate\Http\Request $request, App\Services\AcademyService $academyService) {
+            $result = $academyService->submitExam($request->user(), $examId, $request->input('answers', []));
+
+            // Return to course or show result
+            // For now, redirect back with flash message
+            return redirect()->route('academy.show', $result->exam->chapter->course_id)
+                ->with('success', $result->passed ? 'You passed the exam!' : 'You failed. Try again.');
+        })->name('academy.submit');
+
+        Route::post('/academy/chapters/{chapter}/complete', function (\App\Models\Chapter $chapter, \Illuminate\Http\Request $request, App\Services\AcademyService $academyService) {
+            $academyService->markChapterComplete($request->user(), $chapter->id);
+            return back(); // Inertia will reload props
+        })->name('academy.chapters.complete');
+    });
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit')->middleware('prevent-back-history');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -114,23 +118,27 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('dj-equipment', \App\Http\Controllers\DjEquipmentController::class)->only(['store', 'update', 'destroy']);
 
     // AI Assistant
-    Route::get('/assistant', [\App\Http\Controllers\AssistantController::class, 'index'])->name('assistant.index');
-    Route::get('/assistant/{model}', [\App\Http\Controllers\AssistantController::class, 'show'])->name('assistant.chat');
-    Route::post('/assistant/{model}/chat', [\App\Http\Controllers\AssistantController::class, 'chat'])->name('assistant.sendMessage');
+    Route::middleware(['module:assistant'])->group(function () {
+        Route::get('/assistant', [\App\Http\Controllers\AssistantController::class, 'index'])->name('assistant.index');
+        Route::get('/assistant/{model}', [\App\Http\Controllers\AssistantController::class, 'show'])->name('assistant.chat');
+        Route::post('/assistant/{model}/chat', [\App\Http\Controllers\AssistantController::class, 'chat'])->name('assistant.sendMessage');
+    });
 
     // PRO Subscription
     Route::get('/subscription', [\App\Http\Controllers\SubscriptionController::class, 'index'])->name('subscription.index');
     Route::post('/subscription/subscribe', [\App\Http\Controllers\SubscriptionController::class, 'subscribe'])->name('subscription.subscribe');
-    Route::get('/subscription', [\App\Http\Controllers\SubscriptionController::class, 'index'])->name('subscription.index');
-    Route::post('/subscription/subscribe', [\App\Http\Controllers\SubscriptionController::class, 'subscribe'])->name('subscription.subscribe');
     Route::post('/subscription/trial', [\App\Http\Controllers\SubscriptionController::class, 'activateTrial'])->name('subscription.activateTrial');
     Route::get('/subscription/success', [\App\Http\Controllers\SubscriptionController::class, 'success'])->name('subscription.success');
+
+    // Calendar / Agenda
+    Route::resource('calendar', \App\Http\Controllers\EventController::class)->only(['index', 'store', 'update', 'destroy'])->middleware('module:agenda');
 });
 
 // Flow Redirects (Public to handle Session Loss)
 Route::match(['get', 'post'], '/subscription/return', [\App\Http\Controllers\SubscriptionController::class, 'return'])->name('subscription.return');
 
 Route::get('/profile/{username}', [ProfileController::class, 'show'])->name('profile.show');
+Route::get('/api/profile/{username}/events', [\App\Http\Controllers\EventController::class, 'publicEvents'])->name('api.profile.events');
 
 Route::middleware(['auth', 'verified', 'role:Admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', function () {

@@ -95,13 +95,16 @@ const { currentTheme, setTheme, initTheme } = useTheme();
                             <PremiumNavLink :href="route('dashboard')" :active="route().current('dashboard') || route().current('feed.*')">
                                 {{ __('Global Feed') }}
                             </PremiumNavLink>
-                            <PremiumNavLink :href="route('pool')" :active="route().current('pool')">
+                            <PremiumNavLink v-if="$page.props.modules.pool" :href="route('pool')" :active="route().current('pool')">
                                 {{ __('Music Pool') }}
                             </PremiumNavLink>
-                            <PremiumNavLink :href="route('academy') || route('academy.*')" :active="route().current('academy') || route().current('academy.*')">
+                            <PremiumNavLink v-if="$page.props.modules.academy" :href="route('academy') || route('academy.*')" :active="route().current('academy') || route().current('academy.*')">
                                 {{ __('Academy') }}
                             </PremiumNavLink>
-                            <NavLink :href="route('assistant.index')" :active="route().current('assistant.*')">
+                            <NavLink v-if="$page.props.modules.agenda" :href="route('calendar.index')" :active="route().current('calendar.*')">
+                                {{ __('Agenda') }}
+                            </NavLink>
+                            <NavLink v-if="$page.props.modules.assistant" :href="route('assistant.index')" :active="route().current('assistant.*')">
                                 {{ __('AI Assistant') }}
                             </NavLink>
                             <NavLink v-if="$page.props.auth.user && !$page.props.auth.user.is_pro" :href="route('subscription.index')" :active="route().current('subscription.*')" class="text-yellow-500 font-bold">
@@ -204,15 +207,18 @@ const { currentTheme, setTheme, initTheme } = useTheme();
                     <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">
                         {{ __('Dashboard') }}
                     </ResponsiveNavLink>
-                    <ResponsiveNavLink :href="route('pool')" :active="route().current('pool')">
+                    <ResponsiveNavLink v-if="$page.props.modules.pool" :href="route('pool')" :active="route().current('pool')">
                         {{ __('Music Pool') }}
                     </ResponsiveNavLink>
-                    <ResponsiveNavLink :href="route('academy')" :active="route().current('academy') || route().current('academy.*')">
+                    <ResponsiveNavLink v-if="$page.props.modules.academy" :href="route('academy')" :active="route().current('academy') || route().current('academy.*')">
                         {{ __('Academy') }}
                     </ResponsiveNavLink>
-                    <ResponsiveNavLink :href="route('assistant.index')" :active="route().current('assistant.*')">
-                    {{ __('AI Assistant') }}
-                </ResponsiveNavLink>
+                    <ResponsiveNavLink v-if="$page.props.modules.agenda" :href="route('calendar.index')" :active="route().current('calendar.*')">
+                        {{ __('Agenda') }}
+                    </ResponsiveNavLink>
+                    <ResponsiveNavLink v-if="$page.props.modules.assistant" :href="route('assistant.index')" :active="route().current('assistant.*')">
+                        {{ __('AI Assistant') }}
+                    </ResponsiveNavLink>
                 <ResponsiveNavLink v-if="$page.props.auth.user && !$page.props.auth.user.is_pro" :href="route('subscription.index')" :active="route().current('subscription.*')" class="text-yellow-600 font-bold bg-yellow-50 dark:bg-yellow-900/20">
                     {{ __('Upgrade to PRO') }}
                 </ResponsiveNavLink>

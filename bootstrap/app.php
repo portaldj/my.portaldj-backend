@@ -24,6 +24,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
             'prevent-back-history' => \App\Http\Middleware\PreventBackHistory::class,
+            'module' => \App\Http\Middleware\CheckModuleEnabled::class,
         ]);
 
         $middleware->validateCsrfTokens(except: [

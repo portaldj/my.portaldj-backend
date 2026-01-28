@@ -113,6 +113,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Subscription::class);
     }
 
+    public function events()
+    {
+        return $this->hasMany(Event::class);
+    }
+
     public function getIsProAttribute()
     {
         // Check for role 'Admin' (always pro)

@@ -19,15 +19,13 @@ class SettingsController extends Controller
     public function update(Request $request)
     {
         $data = $request->validate([
-            'pool_is_pro' => 'boolean',
-            'academy_is_pro' => 'boolean',
-            'assistant_is_pro' => 'boolean',
+            'settings' => 'required|array',
         ]);
 
-        foreach ($data as $key => $value) {
+        foreach ($data['settings'] as $key => $value) {
             Setting::updateOrCreate(
                 ['key' => $key],
-                ['value' => $value ? '1' : '0']
+                ['value' => $value] // Store boolean as string '1'/'0' or 'true'/'false' depending on frontend. Let's assume standard values.
             );
         }
 

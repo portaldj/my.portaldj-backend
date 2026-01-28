@@ -60,6 +60,8 @@ class ProfileService
                 $profileAttributes[] = 'username';
             }
 
+            $profileAttributes[] = 'theme';
+
             // Privacy Fields
             $profileAttributes[] = 'is_email_public';
             $profileAttributes[] = 'is_phone_public';
