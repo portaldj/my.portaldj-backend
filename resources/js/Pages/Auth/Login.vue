@@ -49,14 +49,17 @@ const submit = async () => {
 
 <template>
     <div class="min-h-screen bg-gray-100 dark:bg-gray-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-        <Head :title="__('Log in')" />
+    <Head>
+        <title>{{ __('Log in') }}</title>
+        <meta name="description" :content="__('Log in to your Portal DJ account to manage your profile, presskit, and bookings. Access the Music Pool and AI Assistant.')" />
+    </Head>
 
         <div class="sm:mx-auto sm:w-full sm:max-w-md">
             <Link href="/" class="flex justify-center">
                  <ApplicationLogo class="h-20 w-20 fill-current text-brand-primary" />
             </Link>
             <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
-                {{ __('Te damos la bienvenida a tu perfil profesional DJ!') }}
+                {{ __('¡Te damos la bienvenida a tu perfil profesional DJ!') }}
             </h2>
             <p class="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
                 {{ __('Conecta, colabora y crece con la comunidad.') }}
@@ -119,7 +122,10 @@ const submit = async () => {
                     </div>
 
                     <div class="text-xs text-center text-gray-500 dark:text-gray-400">
-                         {{ __('Al hacer clic en «Login» para iniciar sesión, aceptas las Condiciones de uso, la Política de privacidad y la Política de cookies.') }}
+                         {{ __('By clicking Login, you agree to our') }} 
+                         <Link :href="route('terms.show')" class="underline hover:text-gray-900 dark:hover:text-gray-100">{{ __('Terms of Use') }}</Link>, 
+                         <Link :href="route('policy.show')" class="underline hover:text-gray-900 dark:hover:text-gray-100">{{ __('Privacy Policy') }}</Link> {{ __('and') }} 
+                         <Link :href="route('cookies.show')" class="underline hover:text-gray-900 dark:hover:text-gray-100">{{ __('Cookie Policy') }}</Link>.
                     </div>
 
                     <div>

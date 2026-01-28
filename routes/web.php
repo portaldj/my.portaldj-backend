@@ -6,6 +6,12 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', [\App\Http\Controllers\WelcomeController::class, 'index']);
+Route::get('/terms', function () {
+    return Inertia::render('Legal/TermsOfService'); })->name('terms.show');
+Route::get('/privacy-policy', function () {
+    return Inertia::render('Legal/PrivacyPolicy'); })->name('policy.show');
+Route::get('/cookies', function () {
+    return Inertia::render('Legal/CookiePolicy'); })->name('cookies.show');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // Session Verification Route (for client-side active checking)

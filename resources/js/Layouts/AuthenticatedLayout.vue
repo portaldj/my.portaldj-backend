@@ -84,9 +84,10 @@ const { currentTheme, setTheme, initTheme } = useTheme();
                         <!-- Logo -->
                         <div class="flex shrink-0 items-center">
                             <Link :href="route('dashboard')">
-                                <span class="text-2xl font-bold bg-gradient-to-r from-brand-secondary to-brand-accent bg-clip-text text-transparent">
-                                    PORTAL DJ
-                                </span>
+                                <!-- Light Mode Logo -->
+                                <img src="/images/logo.png" alt="Portal DJ" class="block dark:hidden h-10 w-auto object-contain" />
+                                <!-- Dark Mode Logo -->
+                                <img src="/images/logo-dark.png" alt="Portal DJ" class="hidden dark:block h-10 w-auto object-contain" />
                             </Link>
                         </div>
 

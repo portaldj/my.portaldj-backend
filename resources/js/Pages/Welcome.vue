@@ -26,7 +26,11 @@ const availableCities = computed(() => {
 </script>
 
 <template>
-    <Head :title="__('Welcome')" />
+    <Head>
+        <title>{{ __('Welcome') }}</title>
+        <meta name="description" :content="__('Find standard and verified DJs. Create your professional DJ profile, online presskit, and get found by event organizers. Join the community.')" />
+        <meta name="keywords" content="find djs, dj profile, online presskit, get found, dj booking, music pool, dj academy" />
+    </Head>
     <div class="min-h-screen bg-gray-100 dark:bg-brand-dark text-gray-900 dark:text-gray-100 transition-colors duration-300">
         <!-- Top Navigation (Login/Register) -->
         <nav v-if="canLogin" class="absolute top-0 right-0 p-6 z-50 flex justify-end space-x-4">

@@ -66,7 +66,10 @@ const submit = async () => {
 
 <template>
     <div class="min-h-screen bg-gray-100 dark:bg-gray-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-        <Head :title="__('Register')" />
+    <Head>
+        <title>{{ __('Register') }}</title>
+        <meta name="description" :content="__('Join Portal DJ to create your professional profile, presskit, and access our Music Pool. Get found by promoters and grow your career.')" />
+    </Head>
 
         <div class="sm:mx-auto sm:w-full sm:max-w-md">
             <Link href="/" class="flex justify-center">
@@ -223,7 +226,10 @@ const submit = async () => {
                     </div>
 
                     <div class="text-xs text-center text-gray-500 dark:text-gray-400 mt-4">
-                         {{ __('Al hacer clic en «Registrarse», aceptas las Condiciones de uso, la Política de privacidad y la Política de cookies de Portal DJ.') }}
+                         {{ __('By clicking Register, you agree to our') }} 
+                         <Link :href="route('terms.show')" class="underline hover:text-gray-900 dark:hover:text-gray-100">{{ __('Terms of Use') }}</Link>, 
+                         <Link :href="route('policy.show')" class="underline hover:text-gray-900 dark:hover:text-gray-100">{{ __('Privacy Policy') }}</Link> {{ __('and') }} 
+                         <Link :href="route('cookies.show')" class="underline hover:text-gray-900 dark:hover:text-gray-100">{{ __('Cookie Policy') }}</Link>.
                     </div>
 
                     <div class="mt-4">
