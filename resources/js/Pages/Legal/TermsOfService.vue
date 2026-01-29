@@ -136,10 +136,12 @@ defineProps({
                             <li><strong>{{ __('terms.section_5_2_reverse') }}:</strong> {{ __('terms.section_5_2_reverse_desc') }}</li>
                             <li><strong>{{ __('terms.section_5_2_offensive') }}:</strong> {{ __('terms.section_5_2_offensive_desc') }}</li>
                         </ul>
+                        
+                        <h3 class="text-xl font-bold mt-6 mb-3 text-red-600 dark:text-red-400">{{ __('terms.section_5_3_title') }}</h3>
+                        <p>{{ __('terms.section_5_3_text') }}</p>
 
                         <h2 class="text-2xl font-bold mt-8 mb-4 text-brand-primary">{{ __('terms.section_6_title') }}</h2>
                         <p>{{ __('terms.section_6_text') }}</p>
-                        <p class="mt-2">{{ __('terms.section_6_prohibition') }}</p>
 
                         <h2 class="text-2xl font-bold mt-8 mb-4 text-brand-primary">{{ __('terms.section_7_title') }}</h2>
                         <p>{{ __('terms.section_7_text') }} <a href="mailto:pro@portaldj.cl" class="text-brand-primary hover:underline">pro@portaldj.cl</a></p>
