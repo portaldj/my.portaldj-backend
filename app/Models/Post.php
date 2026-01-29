@@ -14,6 +14,11 @@ class Post extends Model
         'location_tag_id',
     ];
 
+    public function locationTag()
+    {
+        return $this->morphTo();
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -21,7 +26,7 @@ class Post extends Model
 
     public function comments()
     {
-        return $this->hasMany(Comment::class);
+        return $this->morphMany(Comment::class, 'commentable');
     }
 
     public function likes()

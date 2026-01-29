@@ -1,7 +1,8 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import CommentSection from '@/Components/Academy/CommentSection.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 const props = defineProps({
     course: Object,
@@ -9,11 +10,17 @@ const props = defineProps({
 
 // Auto-select first incomplete chapter or fallback to first
 const firstIncomplete = props.course.chapters.find(c => !c.is_completed);
-const currentChapter = ref(firstIncomplete || props.course.chapters[0] || null);
+const initialChapter = firstIncomplete || props.course.chapters[0] || null;
+const selectedChapterId = ref(initialChapter ? initialChapter.id : null);
+
+const currentChapter = computed(() => {
+    return props.course.chapters.find(c => c.id === selectedChapterId.value) || null;
+});
+
 const iframeLoaded = ref(false);
 
 const selectChapter = (chapter) => {
-    currentChapter.value = chapter;
+    selectedChapterId.value = chapter.id;
     iframeLoaded.value = false;
 };
 
@@ -87,6 +94,11 @@ const markComplete = () => {
                                 </span>
                             </div>
                             <p class="text-gray-300">{{ currentChapter?.content || course.description }}</p>
+                        </div>
+
+                        <!-- Comments Section -->
+                        <div v-if="currentChapter" class="bg-brand-surface p-6 rounded-lg shadow border border-gray-700">
+                            <CommentSection :comments="currentChapter.comments || []" :chapter-id="currentChapter.id" />
                         </div>
                     </div>
 

@@ -293,5 +293,20 @@
     "legal_cookies_types": "Usamos cookies esenciales para el funcionamiento del sitio, cookies de análisis para entender el uso y cookies de funcionalidad.",
     "By clicking Login, you agree to our": "Al hacer clic en Login, aceptas nuestros",
     "By clicking Register, you agree to our": "Al hacer clic en Registrarse, aceptas nuestros",
-    "and": "y"
+    "and": "y",
+    "Your Activity": "Tu Actividad",
+    "Activity Feed": "Actividad Reciente",
+    "No activity found.": "No se encontró actividad.",
+    "posted on your profile": "publicó en tu perfil",
+    "commented on a post": "comentó en una publicación",
+    "replied to a post": "respondió a una publicación",
+    "posted an update": "publicó una actualización",
+    "View Post": "Ver Publicación",
+    "Are you sure you want to delete this post?": "¿Estás seguro de que deseas eliminar esta publicación?",
+    "Failed to delete post.": "Error al eliminar la publicación.",
+    "Failed to post comment.": "Error al publicar el comentario.",
+    "Failed to delete comment.": "Error al eliminar el comentario.",
+    "Are you sure you want to delete this comment?": "¿Estás seguro de que deseas eliminar este comentario?",
+    "Recent Activity": "Actividad Reciente",
+    "This user has no recent activity.": "Este usuario no tiene actividad reciente."
 }

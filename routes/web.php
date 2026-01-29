@@ -37,6 +37,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/feed/posts/{post}', [\App\Http\Controllers\FeedController::class, 'destroy'])->name('feed.destroy');
     Route::delete('/feed/comments/{comment}', [\App\Http\Controllers\FeedController::class, 'destroyComment'])->name('feed.comments.destroy');
     Route::get('/feed/posts/{post}/comments', [\App\Http\Controllers\FeedController::class, 'getComments'])->name('feed.comments.index');
+    Route::get('/feed/posts/{post}', [\App\Http\Controllers\FeedController::class, 'show'])->name('feed.show');
+    Route::get('/profile/activity', [\App\Http\Controllers\UserActivityController::class, 'index'])->name('profile.activity');
 
     Route::middleware(['module:pool'])->group(function () {
         Route::get('/pool', function (App\Services\PoolService $poolService) {
@@ -117,6 +119,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
             $academyService->markChapterComplete($request->user(), $chapter->id);
             return back(); // Inertia will reload props
         })->name('academy.chapters.complete');
+
+        Route::post('/academy/chapters/{chapter}/comments', [\App\Http\Controllers\ChapterCommentController::class, 'store'])->name('academy.chapters.comments.store');
     });
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit')->middleware('prevent-back-history');

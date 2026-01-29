@@ -162,6 +162,9 @@ const { currentTheme, setTheme, initTheme } = useTheme();
                                         <DropdownLink :href="route('profile.edit')" class="text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-brand-gray hover:text-brand-primary dark:hover:text-brand-accent">
                                             {{ __('Edit Profile') }}
                                         </DropdownLink>
+                                         <DropdownLink :href="route('profile.activity')" class="text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-brand-gray hover:text-brand-primary dark:hover:text-brand-accent">
+                                            {{ __('Your Activity') }}
+                                        </DropdownLink>
                                         <DropdownLink :href="route('logout')" method="post" as="button" class="text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-brand-gray hover:text-red-500 dark:hover:text-brand-secondary">
                                             {{ __('Log Out') }}
                                         </DropdownLink>
@@ -236,6 +239,7 @@ const { currentTheme, setTheme, initTheme } = useTheme();
 
                     <div class="mt-3 space-y-1">
                         <ResponsiveNavLink :href="route('profile.edit')"> {{ __('Profile') }} </ResponsiveNavLink>
+                        <ResponsiveNavLink :href="route('profile.activity')"> {{ __('Your Activity') }} </ResponsiveNavLink>
                         <ResponsiveNavLink :href="route('logout')" method="post" as="button"> {{ __('Log Out') }} </ResponsiveNavLink>
                     </div>
                 </div>

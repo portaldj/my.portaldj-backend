@@ -39,7 +39,8 @@ class AcademyService
                 'chapters' => function ($query) {
                     $query->orderBy('order');
                 },
-                'chapters.exam'
+                'chapters.exam',
+                'chapters.comments.user'
             ])
             ->findOrFail($courseId);
 

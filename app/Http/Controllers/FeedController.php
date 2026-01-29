@@ -15,6 +15,22 @@ class FeedController extends Controller
         $this->feedService = $feedService;
     }
 
+    public function show($postId)
+    {
+        $post = \App\Models\Post::with(['user.profile', 'comments.user.profile', 'likes', 'taggedClubs', 'taggedCities', 'taggedDjs', 'locationTag'])
+            ->withCount(['likes', 'comments'])
+            ->withExists([
+                'likes as is_liked' => function ($query) {
+                    $query->where('user_id', auth()->id());
+                }
+            ])
+            ->findOrFail($postId);
+
+        return \Inertia\Inertia::render('Feed/Show', [
+            'post' => $post
+        ]);
+    }
+
     /**
      * Store a newly created post in storage.
      */

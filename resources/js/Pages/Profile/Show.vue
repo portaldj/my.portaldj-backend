@@ -178,9 +178,13 @@ const jsonLd = computed(() => {
                 </div>
 
                 <!-- Actions -->
-                <div class="mt-6 md:mt-24" v-if="isOwnProfile">
+                <!-- Actions -->
+                <div class="mt-6 md:mt-24 flex space-x-2" v-if="isOwnProfile">
                     <Link :href="route('profile.edit')" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded font-bold text-sm transition">
                         {{ __('Edit Profile') }}
+                    </Link>
+                     <Link :href="route('profile.activity')" class="px-4 py-2 bg-brand-primary hover:bg-brand-secondary text-white rounded font-bold text-sm transition">
+                        {{ __('Your Activity') }}
                     </Link>
                 </div>
             </div>
