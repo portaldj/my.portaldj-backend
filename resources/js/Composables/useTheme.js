@@ -26,7 +26,7 @@ export function useTheme() {
 
         // Update user profile if authenticated
         if (page.props.auth.user) {
-            router.post(route('profile.update'), {
+            router.post(route('profile.theme'), {
                 theme: theme,
                 _method: 'PATCH',
             }, {

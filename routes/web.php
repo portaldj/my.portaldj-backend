@@ -7,11 +7,14 @@ use Inertia\Inertia;
 
 Route::get('/', [\App\Http\Controllers\WelcomeController::class, 'index']);
 Route::get('/terms', function () {
-    return Inertia::render('Legal/TermsOfService'); })->name('terms.show');
+    return Inertia::render('Legal/TermsOfService');
+})->name('terms.show');
 Route::get('/privacy-policy', function () {
-    return Inertia::render('Legal/PrivacyPolicy'); })->name('policy.show');
+    return Inertia::render('Legal/PrivacyPolicy');
+})->name('policy.show');
 Route::get('/cookies', function () {
-    return Inertia::render('Legal/CookiePolicy'); })->name('cookies.show');
+    return Inertia::render('Legal/CookiePolicy');
+})->name('cookies.show');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // Session Verification Route (for client-side active checking)
@@ -117,6 +120,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit')->middleware('prevent-back-history');
+    Route::patch('/profile/theme', [ProfileController::class, 'updateTheme'])->name('profile.theme');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 

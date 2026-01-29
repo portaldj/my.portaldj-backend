@@ -19,12 +19,13 @@ export default {
             },
             colors: {
                 brand: {
-                    dark: '#030303',
-                    gray: '#121212',
-                    surface: '#1E1E1E',
-                    primary: '#7C3AED', // Violet 600
-                    secondary: '#EC4899', // Pink 500
-                    accent: '#06B6D4', // Cyan 500
+                    dark: '#17151A',     // Provided Dark
+                    gray: '#201E26',     // Derived darker surface
+                    surface: '#292730',  // Derived lighter surface
+                    primary: '#0052E2',  // Provided Logo Blue
+                    secondary: '#26A09E',// Provided Teal
+                    accent: '#4170A1',   // Provided Steel Blue
+                    purple: '#42437A',   // Provided Purple
                 }
             }
         },
