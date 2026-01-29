@@ -219,6 +219,11 @@ Route::middleware(['auth', 'verified', 'role:Admin'])->prefix('admin')->name('ad
     Route::post('equipment-models', [\App\Http\Controllers\Admin\EquipmentController::class, 'storeModel'])->name('equipment-models.store');
     Route::patch('equipment-models/{model}', [\App\Http\Controllers\Admin\EquipmentController::class, 'updateModel'])->name('equipment-models.update');
     Route::delete('equipment-models/{model}', [\App\Http\Controllers\Admin\EquipmentController::class, 'destroyModel'])->name('equipment-models.destroy');
+
+    // Booking Promotions
+    Route::get('promotions', [\App\Http\Controllers\Admin\BookingPromotionController::class, 'index'])->name('promotions.index');
+    Route::post('promotions/{bookingPromotion}/approve', [\App\Http\Controllers\Admin\BookingPromotionController::class, 'approve'])->name('promotions.approve');
+    Route::post('promotions/{bookingPromotion}/reject', [\App\Http\Controllers\Admin\BookingPromotionController::class, 'reject'])->name('promotions.reject');
 });
 
 require __DIR__ . '/auth.php';

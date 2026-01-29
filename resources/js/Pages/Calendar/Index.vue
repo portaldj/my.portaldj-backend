@@ -83,6 +83,8 @@ const form = useForm({
     end: '',
     url: '',
     is_public: true,
+    promote: false,
+    press_release: '',
 });
 
 function handleDateSelect(selectInfo) {
@@ -132,6 +134,11 @@ function handleEventClick(clickInfo) {
     form.description = event.extendedProps.description;
     form.url = event.extendedProps.url;
     form.is_public = !!event.extendedProps.is_public;
+    // We don't load promotion status back into the form for editing events yet, 
+    // as the requirement implies this is triggered on creation or new request.
+    // For simplicity, we reset these.
+    form.promote = false;
+    form.press_release = '';
     
     // Format dates for datetime-local input (YYYY-MM-DDTHH:mm)
     // FullCalendar dates are Date objects.
@@ -263,6 +270,26 @@ function closeModal() {
                     <div class="flex items-center">
                         <Checkbox id="is_public" v-model:checked="form.is_public" />
                         <InputLabel for="is_public" :value="__('Visible on Public Profile')" class="ml-2" />
+                    </div>
+
+                    <div class="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
+                        <div class="flex items-center mb-2">
+                             <Checkbox id="promote" v-model:checked="form.promote" />
+                             <InputLabel for="promote" :value="__('Promote this date on Portal DJ Blog?')" class="ml-2 font-bold text-brand-primary" />
+                        </div>
+                        <p class="text-xs text-gray-500 mb-3 ml-6">{{ __('If selected, our team will review your press note and publish it on the blog if approved.') }}</p>
+                        
+                        <div v-if="form.promote" class="ml-6 space-y-2">
+                             <InputLabel for="press_release" :value="__('Press Release / Note')" />
+                             <textarea 
+                                id="press_release" 
+                                v-model="form.press_release" 
+                                class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm" 
+                                rows="4"
+                                :placeholder="__('Describe your event for the blog post...')"
+                            ></textarea>
+                            <InputError :message="form.errors.press_release" class="mt-2" />
+                        </div>
                     </div>
 
                     <div class="mt-6 flex justify-end gap-3">

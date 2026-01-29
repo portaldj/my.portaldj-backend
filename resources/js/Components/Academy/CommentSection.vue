@@ -33,17 +33,17 @@ const submitComment = () => {
 
 <template>
     <div class="space-y-6">
-        <h3 class="text-xl font-bold text-white">{{ __('Comments') }} ({{ comments.length }})</h3>
+        <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ __('Comments') }} ({{ comments.length }})</h3>
 
         <!-- Comment Form -->
-        <form @submit.prevent="submitComment" class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+        <form @submit.prevent="submitComment" class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
             <div class="mb-4">
                 <label for="comment" class="sr-only">{{ __('Add a comment') }}</label>
                 <textarea
                     id="comment"
                     v-model="form.content"
                     rows="3"
-                    class="w-full bg-gray-900 text-white border-gray-700 rounded-lg focus:ring-brand-primary focus:border-brand-primary placeholder-gray-500"
+                    class="w-full bg-white dark:bg-gray-900 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700 rounded-lg focus:ring-brand-primary focus:border-brand-primary placeholder-gray-500"
                     :placeholder="__('Share your thoughts about this chapter...')"
                     required
                 ></textarea>
@@ -66,7 +66,7 @@ const submitComment = () => {
                 {{ __('No comments yet. Be the first to share your thoughts!') }}
             </div>
 
-            <div v-for="comment in comments" :key="comment.id" class="bg-gray-800/50 p-4 rounded-lg border border-gray-700/50">
+            <div v-for="comment in comments" :key="comment.id" class="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg border border-gray-200 dark:border-gray-700/50">
                 <div class="flex items-start space-x-3">
                     <div class="flex-shrink-0">
                         <div class="w-10 h-10 rounded-full bg-brand-primary flex items-center justify-center text-white font-bold">
@@ -75,10 +75,10 @@ const submitComment = () => {
                     </div>
                     <div class="flex-1">
                         <div class="flex justify-between items-baseline">
-                            <h4 class="text-sm font-bold text-gray-200">{{ comment.user.name }}</h4>
+                            <h4 class="text-sm font-bold text-gray-800 dark:text-gray-200">{{ comment.user.name }}</h4>
                             <span class="text-xs text-gray-500">{{ dayjs(comment.created_at).fromNow() }}</span>
                         </div>
-                        <p class="mt-1 text-gray-300 text-sm whitespace-pre-wrap">{{ comment.content }}</p>
+                        <p class="mt-1 text-gray-700 dark:text-gray-300 text-sm whitespace-pre-wrap">{{ comment.content }}</p>
                     </div>
                 </div>
             </div>

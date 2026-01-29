@@ -45,9 +45,9 @@ const markComplete = () => {
     <AuthenticatedLayout>
         <template #header>
             <div class="flex items-center justify-between">
-                <h2 class="text-xl font-semibold leading-tight text-white">
-                    <Link :href="route('academy')" class="text-gray-400 hover:text-white transition">&larr; {{ __('Academy') }}</Link>
-                    <span class="mx-2 text-gray-600">/</span>
+                <h2 class="text-xl font-semibold leading-tight text-gray-800 dark:text-white">
+                    <Link :href="route('academy')" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white transition">&larr; {{ __('Academy') }}</Link>
+                    <span class="mx-2 text-gray-400 dark:text-gray-600">/</span>
                     {{ course.title }}
                 </h2>
             </div>
@@ -59,7 +59,7 @@ const markComplete = () => {
                     
                     <!-- Main Content (Video Player & Description) -->
                     <div class="lg:col-span-2 space-y-6">
-                        <div v-if="currentChapter?.video_url" class="bg-black rounded-lg overflow-hidden shadow-lg border border-gray-800 aspect-video flex items-center justify-center relative group">
+                        <div v-if="currentChapter?.video_url" class="bg-black rounded-lg overflow-hidden shadow-lg border border-gray-200 dark:border-gray-800 aspect-video flex items-center justify-center relative group">
                             <!-- Placeholder Video Player -->
                             <div class="w-full h-full bg-gray-900 flex items-center justify-center">
                                 <span v-if="!iframeLoaded" class="absolute text-gray-500">{{ __('Video Player Loading...') }}</span>
@@ -78,9 +78,9 @@ const markComplete = () => {
                             </div>
                         </div>
 
-                        <div class="bg-brand-surface p-6 rounded-lg shadow border border-gray-700">
+                        <div class="bg-white dark:bg-brand-surface p-6 rounded-lg shadow border border-gray-200 dark:border-gray-700">
                             <div class="flex justify-between items-start mb-4">
-                                <h3 class="text-2xl font-bold text-white">{{ currentChapter?.title || course.title }}</h3>
+                                <h3 class="text-2xl font-bold text-gray-900 dark:text-white">{{ currentChapter?.title || course.title }}</h3>
                                 <button 
                                     v-if="currentChapter && !currentChapter.is_completed" 
                                     @click="markComplete" 
@@ -93,31 +93,31 @@ const markComplete = () => {
                                     {{ __('Completed') }}
                                 </span>
                             </div>
-                            <p class="text-gray-300">{{ currentChapter?.content || course.description }}</p>
+                            <p class="text-gray-600 dark:text-gray-300">{{ currentChapter?.content || course.description }}</p>
                         </div>
 
                         <!-- Comments Section -->
-                        <div v-if="currentChapter" class="bg-brand-surface p-6 rounded-lg shadow border border-gray-700">
+                        <div v-if="currentChapter" class="bg-white dark:bg-brand-surface p-6 rounded-lg shadow border border-gray-200 dark:border-gray-700">
                             <CommentSection :comments="currentChapter.comments || []" :chapter-id="currentChapter.id" />
                         </div>
                     </div>
 
                     <!-- Sidebar (Chapter List) -->
                     <div class="space-y-6">
-                        <div class="bg-brand-surface rounded-lg shadow border border-gray-700 overflow-hidden">
-                            <div class="p-4 bg-gray-800 border-b border-gray-700 flex justify-between items-center">
-                                <h3 class="font-bold text-gray-200">{{ __('Course Content') }}</h3>
+                        <div class="bg-white dark:bg-brand-surface rounded-lg shadow border border-gray-200 dark:border-gray-700 overflow-hidden">
+                            <div class="p-4 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                                <h3 class="font-bold text-gray-700 dark:text-gray-200">{{ __('Course Content') }}</h3>
                                 <span class="text-xs text-gray-400">
                                     {{ course.chapters.filter(c => c.is_completed).length }}/{{ course.chapters.length }} {{ __('Completed') }}
                                 </span>
                             </div>
-                            <ul class="divide-y divide-gray-700 max-h-[600px] overflow-y-auto">
+                            <ul class="divide-y divide-gray-200 dark:divide-gray-700 max-h-[600px] overflow-y-auto">
                                 <li 
                                     v-for="chapter in course.chapters" 
                                     :key="chapter.id" 
                                     @click="selectChapter(chapter)"
-                                    class="p-4 cursor-pointer transition hover:bg-gray-800 flex items-center justify-between"
-                                    :class="{'bg-brand-gray/50 border-l-4 border-brand-accent': currentChapter?.id === chapter.id}"
+                                    class="p-4 cursor-pointer transition hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center justify-between"
+                                    :class="{'bg-brand-primary/5 border-l-4 border-brand-primary dark:bg-brand-gray/50 dark:border-brand-accent': currentChapter?.id === chapter.id}"
                                 >
                                     <div class="flex items-center space-x-3">
                                         <!-- Status Icon -->
@@ -129,7 +129,7 @@ const markComplete = () => {
                                         </div>
                                         
                                         <div>
-                                            <div class="text-sm font-medium text-gray-200" :class="{'line-through text-gray-500': chapter.is_completed && currentChapter?.id !== chapter.id}">
+                                            <div class="text-sm font-medium text-gray-700 dark:text-gray-200" :class="{'line-through text-gray-400 dark:text-gray-500': chapter.is_completed && currentChapter?.id !== chapter.id}">
                                                 {{ chapter.title }}
                                             </div>
                                             <!-- <div class="text-xs text-gray-500">Video</div> -->

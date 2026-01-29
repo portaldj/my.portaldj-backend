@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Comment;
 use App\Models\Post;
+use App\Models\BookingPromotion;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class ActivityService
@@ -25,8 +26,27 @@ class ActivityService
             ->selectRaw('"comment" as type')
             ->get();
 
+        $promotions = BookingPromotion::whereHas('event', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })
+            ->with('event:id,title')
+            ->get()
+            ->map(function ($promo) {
+                return (object) [
+                    'id' => $promo->id,
+                    'user_id' => $promo->event->user_id, // Though indirect
+                    'content' => $promo->press_release,
+                    'created_at' => $promo->created_at,
+                    'type' => 'booking_promotion',
+                    'status' => $promo->status,
+                    'rejection_reason' => $promo->rejection_reason,
+                    'blog_url' => $promo->blog_url,
+                    'event_title' => $promo->event->title,
+                ];
+            });
+
         // Merge and sort
-        $activities = $posts->concat($comments)->sortByDesc('created_at');
+        $activities = $posts->concat($comments)->concat($promotions)->sortByDesc('created_at');
 
         // Paginate manually since we merged collections
         $page = LengthAwarePaginator::resolveCurrentPage();

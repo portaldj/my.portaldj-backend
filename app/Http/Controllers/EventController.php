@@ -30,9 +30,23 @@ class EventController extends Controller
             'end' => 'nullable|date|after_or_equal:start',
             'url' => 'nullable|url',
             'is_public' => 'boolean',
+            'promote' => 'boolean',
+            'press_release' => 'nullable|string|required_if:promote,true',
         ]);
 
-        $request->user()->events()->create($validated);
+        $event = $request->user()->events()->create($validated);
+
+        if ($request->boolean('promote') && $request->filled('press_release')) {
+            $event->bookingPromotion()->create([
+                'status' => 'pending',
+                'press_release' => $request->press_release,
+            ]);
+
+            // Notify Admin
+            \Illuminate\Support\Facades\Mail::to('pro@portaldj.cl')->send(
+                new \App\Mail\BookingPromotionRequested($event, $request->user(), $request->press_release)
+            );
+        }
 
         return redirect()->back()->with('success', __('Event created successfully.'));
     }
@@ -53,9 +67,26 @@ class EventController extends Controller
             'end' => 'nullable|date|after_or_equal:start',
             'url' => 'nullable|url',
             'is_public' => 'boolean',
+            'promote' => 'boolean',
+            'press_release' => 'nullable|string|required_if:promote,true',
         ]);
 
         $event->update($validated);
+
+        if ($request->boolean('promote') && $request->filled('press_release')) {
+            // Check if already promoted to avoid duplicates or re-submission logic
+            if (!$event->bookingPromotion) {
+                $event->bookingPromotion()->create([
+                    'status' => 'pending',
+                    'press_release' => $request->press_release,
+                ]);
+
+                // Notify Admin
+                \Illuminate\Support\Facades\Mail::to('pro@portaldj.cl')->send(
+                    new \App\Mail\BookingPromotionRequested($event, $request->user(), $request->press_release)
+                );
+            }
+        }
 
         return redirect()->back()->with('success', __('Event updated successfully.'));
     }

@@ -308,5 +308,16 @@
     "Failed to delete comment.": "Error al eliminar el comentario.",
     "Are you sure you want to delete this comment?": "¿Estás seguro de que deseas eliminar este comentario?",
     "Recent Activity": "Actividad Reciente",
-    "This user has no recent activity.": "Este usuario no tiene actividad reciente."
+    "This user has no recent activity.": "Este usuario no tiene actividad reciente.",
+    "Promote this date on Portal DJ Blog?": "¿Promocionar esta fecha en el Blog de Portal DJ?",
+    "If selected, our team will review your press note and publish it on the blog if approved.": "Si se selecciona, nuestro equipo revisará tu nota y la publicará en el blog si es aprobada.",
+    "Press Release / Note": "Nota de Prensa / Comunicado",
+    "Describe your event for the blog post...": "Describe tu evento para la publicación...",
+    "Promotion Request": "Solicitud de Promoción",
+    "Event:": "Evento:",
+    "Reason:": "Razón:",
+    "Published at:": "Publicado en:",
+    "Pending": "Pendiente",
+    "Approved": "Aprobado",
+    "Rejected": "Rechazado"
 }
