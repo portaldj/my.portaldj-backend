@@ -6,6 +6,7 @@ import DropdownLink from '@/Components/DropdownLink.vue';
 import PremiumNavLink from '@/Components/PremiumNavLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
 import NavLink from '@/Components/NavLink.vue';
+import NotificationBell from '@/Components/NotificationBell.vue';
 import { Link, usePage } from '@inertiajs/vue3';
 
 const showingNavigationDropdown = ref(false);
@@ -118,6 +119,7 @@ const { currentTheme, setTheme, initTheme } = useTheme();
                     </div>
 
                     <div class="hidden sm:ms-6 sm:flex sm:items-center">
+                        <NotificationBell />
                         <!-- Settings Dropdown -->
                         <div class="relative ms-3" v-if="user">
                             <Dropdown align="right" width="48">
@@ -180,6 +182,7 @@ const { currentTheme, setTheme, initTheme } = useTheme();
 
                     <!-- Hamburger -->
                     <div class="-me-2 flex items-center sm:hidden">
+                        <NotificationBell class="mr-1" />
                             <button
                                 @click="showingNavigationDropdown = !showingNavigationDropdown"
                                 class="inline-flex items-center justify-center rounded-md p-2 text-gray-500 dark:text-gray-400 transition duration-150 ease-in-out hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200 focus:bg-gray-100 dark:focus:bg-gray-800 focus:text-gray-700 dark:focus:text-gray-200 focus:outline-none"

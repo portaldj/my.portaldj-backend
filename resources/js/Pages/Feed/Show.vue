@@ -13,8 +13,8 @@ defineProps({
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-white mb-2">
-                 <Link :href="route('dashboard')" class="text-gray-400 hover:text-white transition">&larr; {{ __('Back to Feed') }}</Link>
+            <h2 class="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200 mb-2">
+                 <Link :href="route('dashboard')" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition">&larr; {{ __('Back to Feed') }}</Link>
             </h2>
         </template>
 

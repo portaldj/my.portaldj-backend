@@ -17,7 +17,17 @@ class FeedController extends Controller
 
     public function show($postId)
     {
-        $post = \App\Models\Post::with(['user.profile', 'comments.user.profile', 'likes', 'taggedClubs', 'taggedCities', 'taggedDjs', 'locationTag'])
+        $post = \App\Models\Post::with([
+            'user.profile',
+            'comments' => function ($query) {
+                $query->latest()->with('user.profile');
+            },
+            'likes',
+            'taggedClubs',
+            'taggedCities',
+            'taggedDjs',
+            'locationTag'
+        ])
             ->withCount(['likes', 'comments'])
             ->withExists([
                 'likes as is_liked' => function ($query) {
@@ -54,6 +64,12 @@ class FeedController extends Controller
     public function like($post)
     {
         $liked = $this->feedService->toggleLike(auth()->user(), $post);
+
+        $postModel = \App\Models\Post::findOrFail($post); // Ensure we have the model
+        if ($liked && $postModel->user_id !== auth()->id()) {
+            $postModel->user->notify(new \App\Notifications\PostInteractionNotification('like', auth()->user(), $postModel));
+        }
+
         return response()->json(['liked' => $liked]);
     }
 
@@ -67,6 +83,25 @@ class FeedController extends Controller
 
         // Eager load user profile for frontend display
         $comment->load('user.profile');
+
+        $postModel = \App\Models\Post::findOrFail($post);
+        // Notify Post Author
+        if ($postModel->user_id !== auth()->id()) {
+            $postModel->user->notify(new \App\Notifications\PostInteractionNotification('comment', auth()->user(), $postModel));
+        }
+
+        // Notify other commenters (excluding author and current user)
+        $otherCommenters = $postModel->comments()
+            ->with('user')
+            ->where('user_id', '!=', auth()->id()) // Not the current commenter
+            ->where('user_id', '!=', $postModel->user_id) // Not the post author (already notified)
+            ->get()
+            ->pluck('user')
+            ->unique('id');
+
+        foreach ($otherCommenters as $commenter) {
+            $commenter->notify(new \App\Notifications\PostInteractionNotification('comment_reply', auth()->user(), $postModel));
+        }
 
         return response()->json(['comment' => $comment, 'message' => __('Comment added successfully.')]);
     }

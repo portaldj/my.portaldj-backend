@@ -40,6 +40,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/feed/posts/{post}', [\App\Http\Controllers\FeedController::class, 'show'])->name('feed.show');
     Route::get('/profile/activity', [\App\Http\Controllers\UserActivityController::class, 'index'])->name('profile.activity');
 
+    // Notifications
+    Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
+    Route::get('/notifications/unread', [\App\Http\Controllers\NotificationController::class, 'unread'])->name('notifications.unread');
+    Route::post('/notifications/{id}/read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('/notifications/read-all', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.readAll');
+
+    // Admin Notifications
+    Route::middleware(['role:Admin'])->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/notifications/create', [\App\Http\Controllers\Admin\NotificationController::class, 'create'])->name('notifications.create');
+        Route::post('/notifications', [\App\Http\Controllers\Admin\NotificationController::class, 'store'])->name('notifications.store');
+    });
+
     Route::middleware(['module:pool'])->group(function () {
         Route::get('/pool', function (App\Services\PoolService $poolService) {
             // Check PRO Access
