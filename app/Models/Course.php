@@ -37,9 +37,14 @@ class Course extends Model
         $info = pathinfo($this->thumbnail_path);
         $path = $info['dirname'] . '/' . $info['filename'] . '_thumb.' . $info['extension'];
 
-        // Check Local
+        // Check Local Variant
         if (\Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
             return '/storage/' . $path;
+        }
+
+        // Check Local Original (Fallback for legacy)
+        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($this->thumbnail_path)) {
+            return '/storage/' . $this->thumbnail_path;
         }
 
         return \Illuminate\Support\Facades\Storage::disk('r2-public')->url($path);
@@ -53,9 +58,14 @@ class Course extends Model
         $info = pathinfo($this->thumbnail_path);
         $path = $info['dirname'] . '/' . $info['filename'] . '_optimized.' . $info['extension'];
 
-        // Check Local
+        // Check Local Variant
         if (\Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
             return '/storage/' . $path;
+        }
+
+        // Check Local Original (Fallback for legacy)
+        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($this->thumbnail_path)) {
+            return '/storage/' . $this->thumbnail_path;
         }
 
         return \Illuminate\Support\Facades\Storage::disk('r2-public')->url($path);

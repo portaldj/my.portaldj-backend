@@ -38,8 +38,8 @@ const deleteCourse = (course) => {
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div v-for="course in courses.data" :key="course.id" class="bg-gray-800 rounded-lg shadow border border-gray-700 overflow-hidden flex flex-col">
-                <div class="h-40 bg-gray-700 bg-cover bg-center relative" :style="course.thumbnail_path ? `background-image: url('/storage/${course.thumbnail_path}')` : ''">
-                    <div v-if="!course.thumbnail_path" class="w-full h-full flex items-center justify-center text-gray-500">
+                <div class="h-40 bg-gray-700 bg-cover bg-center relative" :style="course.thumb_url ? `background-image: url('${course.thumb_url}')` : ''">
+                    <div v-if="!course.thumb_url" class="w-full h-full flex items-center justify-center text-gray-500">
                         No Thumbnail
                     </div>
                     <div class="absolute top-2 right-2">

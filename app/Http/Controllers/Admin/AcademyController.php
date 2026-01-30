@@ -46,6 +46,7 @@ class AcademyController extends Controller
                 'optimized' => [1280, 720]
             ];
             $images = $this->imageService->handle($request->file('thumbnail'), 'thumbnails', $variants);
+            \Illuminate\Support\Facades\Log::info('Course thumbnail uploaded to R2:', ['path' => $images['original']]);
             $validated['thumbnail_path'] = $images['original']; // Store original base path
         }
 

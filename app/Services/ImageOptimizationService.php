@@ -42,7 +42,7 @@ class ImageOptimizationService
 
         // Save original
         $originalPath = "{$path}/{$filename}";
-        Storage::disk('r2-public')->put($originalPath, (string) $encoded);
+        Storage::disk('r2-public')->put($originalPath, (string) $encoded, 'public');
         $paths['original'] = $originalPath;
 
         // 2. Process Variants
@@ -69,7 +69,7 @@ class ImageOptimizationService
             }
 
             $variantEncoded = $variantImage->toJpeg(quality: 80);
-            Storage::disk('r2-public')->put($variantPath, (string) $variantEncoded);
+            Storage::disk('r2-public')->put($variantPath, (string) $variantEncoded, 'public');
 
             $paths[$key] = $variantPath;
         }
