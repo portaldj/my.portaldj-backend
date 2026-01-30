@@ -39,14 +39,14 @@ defineProps({
                             </h3>
                             
                             <p class="text-gray-600 dark:text-gray-400 text-sm mb-6">
-                                Chat with this device's AI to learn features, troubleshoot issues, or get creative tips.
+                                {{ __("Chat with this device's AI to learn features, troubleshoot issues, or get creative tips.") }}
                             </p>
                             
                             <Link 
                                 :href="route('assistant.chat', item.equipment_model.id)" 
                                 class="inline-flex w-full justify-center items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-500 focus:bg-indigo-500 active:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150"
                             >
-                                Start Chat
+                                {{ __('Start Chat') }}
                             </Link>
                         </div>
                     </div>
