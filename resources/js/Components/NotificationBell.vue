@@ -96,6 +96,17 @@ const handleNotificationClick = (notification) => {
                             class="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-150 ease-in-out cursor-pointer"
                         >
                             <div class="flex items-start">
+                                <div class="flex-shrink-0 mr-3">
+                                    <div v-if="notification.data.type === 'like'" class="h-8 w-8 rounded-full bg-red-100 dark:bg-red-900 flex items-center justify-center text-red-600 dark:text-red-300">
+                                        ❤️
+                                    </div>
+                                    <div v-else-if="notification.data.type === 'comment' || notification.data.type === 'comment_reply'" class="h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-600 dark:text-blue-300">
+                                        💬
+                                    </div>
+                                    <div v-else class="h-8 w-8 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300">
+                                        🔔
+                                    </div>
+                                </div>
                                 <div class="flex-1">
                                     <p class="text-sm text-gray-800 dark:text-gray-200">
                                         {{ notification.data.message }}

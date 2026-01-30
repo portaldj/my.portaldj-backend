@@ -41,7 +41,7 @@ class GeneralNotification extends Notification
         return [
             'type' => 'general',
             'message' => $this->message,
-            'link' => '#', // General notifications might not link anywhere specific
+            'link' => route('announcements.index'),
         ];
     }
 }
