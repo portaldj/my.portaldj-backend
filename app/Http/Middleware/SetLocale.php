@@ -17,10 +17,10 @@ class SetLocale
     {
         $locale = 'en';
 
-        if (auth()->check()) {
-            $locale = auth()->user()->locale ?? 'en';
-        } elseif ($request->session()->has('locale')) {
+        if ($request->session()->has('locale')) {
             $locale = $request->session()->get('locale');
+        } elseif (auth()->check()) {
+            $locale = auth()->user()->locale ?? 'en';
         } elseif ($request->header('Accept-Language')) {
             $locale = substr($request->header('Accept-Language'), 0, 2);
             if (!in_array($locale, ['en', 'es'])) {

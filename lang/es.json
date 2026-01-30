@@ -1,4 +1,9 @@
 {
+    "Hello! I am your :model. How can I help you regarding my features today?": "¡Hola! Soy tu :model. ¿En qué puedo ayudarte con respecto a mis funciones hoy?",
+    "Sorry, I encountered an error. Please try again.": "Lo siento, ocurrió un error. Por favor intenta de nuevo.",
+    "Ask a question about this equipment...": "Haz una pregunta sobre este equipo...",
+    "AI Assistant is currently disabled.": "El asistente IA está desactivado actualmente.",
+    "AI response generated using :provider. Check manual for safety.": "Respuesta IA generada usando :provider. Verifica el manual por seguridad.",
     "Agenda": "Agenda",
     "Edit Event": "Editar Evento",
     "New Event": "Nuevo Evento",

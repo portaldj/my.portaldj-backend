@@ -29,6 +29,11 @@ const scrollToBottom = async () => {
     }
 };
 
+const page = usePage();
+const locale = page.props.locale || 'en';
+
+// ... existing code ...
+
 const sendMessage = async () => {
     if (!userInput.value.trim() || loading.value) return;
 
@@ -44,14 +49,21 @@ const sendMessage = async () => {
     try {
         const response = await axios.post(route('assistant.sendMessage', props.model.id), {
             message: text,
-            provider: provider.value
+            provider: provider.value,
+            locale: page.props.locale || 'en' // Pass dynamic locale to backend
         });
         
         // Add AI response
         messages.value.push({ role: 'assistant', content: response.data.reply });
     } catch (error) {
         console.error(error);
-        messages.value.push({ role: 'assistant', content: 'Lo siento, ocurrió un error. Por favor intenta de nuevo.' });
+        // Use __ mixin (check compatibility with script setup or use props.translations directly if mixin is not available in script setup context without extra boilerplate)
+        // Since we are in script setup, we can access translations via page props directly or use a helper. 
+        // But the mixin is available on the instance. In script setup, we need a composable or access via instance proxy.
+        // However, app.js provided the mixin globally options API style.
+        // Easiest is to access page.props.translations directly here as we did in app.js mixin logic.
+        const errorMsg = page.props.translations['Sorry, I encountered an error. Please try again.'] || 'Sorry, I encountered an error. Please try again.';
+        messages.value.push({ role: 'assistant', content: errorMsg });
     } finally {
         loading.value = false;
         await scrollToBottom();
@@ -60,9 +72,12 @@ const sendMessage = async () => {
 
 // Initial welcome message
 onMounted(() => {
+    let greeting = page.props.translations['Hello! I am your :model. How can I help you regarding my features today?'] || 'Hello! I am your :model. How can I help you regarding my features today?';
+    greeting = greeting.replace(':model', props.model.name);
+    
     messages.value.push({ 
         role: 'assistant', 
-        content: `¡Hola! Soy tu ${props.model.name}. ¿En qué puedo ayudarte con respecto a mis funciones hoy?` 
+        content: greeting
     });
 });
 </script>
@@ -139,18 +154,18 @@ onMounted(() => {
                     <TextInput 
                         v-model="userInput" 
                         class="flex-1" 
-                        :placeholder="provider ? 'Haz una pregunta sobre este equipo...' : 'El asistente IA está desactivado actualmente.'"
+                        :placeholder="provider ? __('Ask a question about this equipment...') : __('AI Assistant is currently disabled.')"
                         :disabled="loading || !provider"
                     />
                     <PrimaryButton 
                         type="submit" 
                         :disabled="loading || !userInput.trim() || !provider"
                     >
-                        Send
+                        {{ __('Send') }}
                     </PrimaryButton>
                 </form>
                 <p v-if="provider" class="text-xs text-center text-gray-400 mt-2">
-                    AI response generated using {{ provider === 'openai' ? 'OpenAI GPT' : 'Google Gemini' }}. Check manual for safety.
+                    {{ __('AI response generated using :provider. Check manual for safety.', { provider: provider === 'openai' ? 'OpenAI GPT' : 'Google Gemini' }) }}
                 </p>
             </div>
         </div>

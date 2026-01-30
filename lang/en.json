@@ -1,4 +1,9 @@
 {
+    "Hello! I am your :model. How can I help you regarding my features today?": "Hello! I am your :model. How can I help you regarding my features today?",
+    "Sorry, I encountered an error. Please try again.": "Sorry, I encountered an error. Please try again.",
+    "Ask a question about this equipment...": "Ask a question about this equipment...",
+    "AI Assistant is currently disabled.": "AI Assistant is currently disabled.",
+    "AI response generated using :provider. Check manual for safety.": "AI response generated using :provider. Check manual for safety.",
     "Agenda": "Calendar",
     "Edit Event": "Edit Event",
     "New Event": "New Event",
