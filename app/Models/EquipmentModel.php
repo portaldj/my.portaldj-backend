@@ -22,4 +22,9 @@ class EquipmentModel extends Model
     {
         return $this->hasMany(DjEquipment::class);
     }
+
+    public function chunks()
+    {
+        return $this->hasMany(DocumentationChunk::class);
+    }
 }

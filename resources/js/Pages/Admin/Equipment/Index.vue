@@ -62,16 +62,27 @@ const openTypeModal = (type = null) => {
     addingType.value = true;
 };
 
+const formChunk = useForm({
+    topic: '',
+    content: ''
+});
+
+const currentChunks = ref([]);
+
 const openModelModal = (model = null) => {
     formModel.reset();
     formModel.clearErrors();
+    formChunk.reset();
+    currentChunks.value = [];
+
     if (model) {
         formModel.id = model.id;
         formModel.brand_id = model.brand_id;
         formModel.equipment_type_id = model.equipment_type_id;
         formModel.name = model.name;
         formModel.is_verified = Boolean(model.is_verified);
-        formModel.documentation = model.documentation || '';
+        // Load chunks from the prop (which is eager loaded)
+        currentChunks.value = model.chunks || [];
         isEditing.value = true;
     } else {
         formModel.id = null;
@@ -107,13 +118,53 @@ const submitType = () => {
 const submitModel = () => {
     if (isEditing.value) {
         formModel.patch(route('admin.equipment-models.update', formModel.id), {
-            onSuccess: () => { formModel.reset(); addingModel.value = false; }
+            onSuccess: () => { 
+                formModel.reset(); 
+                addingModel.value = false; 
+            }
         });
     } else {
         formModel.post(route('admin.equipment-models.store'), {
             onSuccess: () => { formModel.reset(); addingModel.value = false; }
         });
     }
+};
+
+const submitChunk = () => {
+    if (!formModel.id) return;
+
+    formChunk.post(route('admin.equipment-chunks.store', formModel.id), {
+        preserveScroll: true,
+        onSuccess: () => {
+            formChunk.reset();
+            // We need to refresh the currentChunks list. 
+            // Since we are using router state/props, the page prop updates.
+            // We need to re-find the model in the updated props OR trust that the page reload updates everything?
+            // Inertia reload updates props. But `currentChunks` is a local ref copy.
+            // We need to watch props or manually update local ref.
+            // A simpler way: Find the updated model in `props.models.data`
+            // But since we are inside a method, `props` is reactive.
+            // Let's rely on a watcher or manual re-fetch.
+            // Actually, `onSuccess` happens after the visit completes.
+            const updatedModel = props.models.data.find(m => m.id === formModel.id);
+            if (updatedModel) {
+                currentChunks.value = updatedModel.chunks;
+            }
+        }
+    });
+};
+
+const deleteChunk = (chunkId) => {
+    if (!confirm('Delete this chunk?')) return;
+    router.delete(route('admin.equipment-chunks.destroy', chunkId), {
+         preserveScroll: true,
+         onSuccess: () => {
+            const updatedModel = props.models.data.find(m => m.id === formModel.id);
+            if (updatedModel) {
+                currentChunks.value = updatedModel.chunks;
+            }
+         }
+    });
 };
 
 const deleteItem = (routeUrl) => {
@@ -304,16 +355,52 @@ const deleteItem = (routeUrl) => {
                             <InputError class="mt-2" :message="formModel.errors.name" />
                         </div>
 
-                        <div>
-                            <InputLabel for="model_documentation" value="Documentation (for AI Assistant)" />
-                            <textarea 
-                                id="model_documentation" 
-                                v-model="formModel.documentation" 
-                                class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
-                                rows="6"
-                                placeholder="Paste manual or technical details here..."
-                            ></textarea>
-                            <InputError class="mt-2" :message="formModel.errors.documentation" />
+                        <div v-if="isEditing" class="border-t border-gray-700 pt-4 mt-4">
+                            <h3 class="text-md font-bold text-gray-200 mb-2">Knowledge Base (RAG)</h3>
+                            <p class="text-xs text-gray-400 mb-4">Break down documentation into logical chunks for better AI retrieval.</p>
+                            
+                            <!-- Chunk List -->
+                            <div v-if="currentChunks.length > 0" class="space-y-2 mb-4 max-h-60 overflow-y-auto pr-1">
+                                <div v-for="chunk in currentChunks" :key="chunk.id" class="bg-gray-800 p-3 rounded border border-gray-700 text-sm">
+                                    <div class="flex justify-between items-start">
+                                        <span class="font-bold text-brand-primary">{{ chunk.topic }}</span>
+                                        <button type="button" @click="deleteChunk(chunk.id)" class="text-red-400 text-xs hover:text-red-300">Delete</button>
+                                    </div>
+                                    <p class="text-gray-400 mt-1 text-xs truncate">{{ chunk.content }}</p>
+                                </div>
+                            </div>
+                            <div v-else class="text-sm text-gray-500 italic mb-4">No chunks added yet.</div>
+
+                            <!-- Add Chunk Form -->
+                            <div class="bg-gray-800 p-3 rounded border border-gray-700">
+                                <h4 class="text-sm font-semibold text-gray-300 mb-2">Add New Chunk</h4>
+                                <div class="space-y-2">
+                                    <TextInput 
+                                        v-model="formChunk.topic" 
+                                        placeholder="Topic (e.g. Jog Adjust)" 
+                                        class="block w-full text-xs" 
+                                    />
+                                    <textarea 
+                                        v-model="formChunk.content" 
+                                        class="block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-xs"
+                                        rows="3"
+                                        placeholder="Content..."
+                                    ></textarea>
+                                    <div class="flex justify-end">
+                                        <SecondaryButton 
+                                            type="button" 
+                                            @click="submitChunk" 
+                                            :disabled="formChunk.processing || !formChunk.topic || !formChunk.content"
+                                            class="text-xs"
+                                        >
+                                            Add Chunk
+                                        </SecondaryButton>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div v-else class="mt-4 p-4 bg-yellow-900/20 text-yellow-500 text-sm rounded">
+                            Save this model first to start adding documentation chunks.
                         </div>
                         
                         <div class="flex items-center gap-2">

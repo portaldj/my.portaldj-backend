@@ -205,6 +205,9 @@ Route::middleware(['auth', 'verified', 'role:Admin'])->prefix('admin')->name('ad
     Route::patch('equipment-models/{model}', [\App\Http\Controllers\Admin\EquipmentController::class, 'updateModel'])->name('equipment-models.update');
     Route::delete('equipment-models/{model}', [\App\Http\Controllers\Admin\EquipmentController::class, 'destroyModel'])->name('equipment-models.destroy');
 
+    Route::post('equipment-models/{model}/chunks', [\App\Http\Controllers\Admin\EquipmentController::class, 'storeChunk'])->name('equipment-chunks.store');
+    Route::delete('chunks/{chunk}', [\App\Http\Controllers\Admin\EquipmentController::class, 'destroyChunk'])->name('equipment-chunks.destroy');
+
     // Booking Promotions
     Route::get('promotions', [\App\Http\Controllers\Admin\BookingPromotionController::class, 'index'])->name('promotions.index');
     Route::post('promotions/{bookingPromotion}/approve', [\App\Http\Controllers\Admin\BookingPromotionController::class, 'approve'])->name('promotions.approve');

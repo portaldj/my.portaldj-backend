@@ -18,7 +18,7 @@ class EquipmentController extends Controller
         return Inertia::render('Admin/Equipment/Index', [
             'brands' => Brand::orderBy('name')->get(),
             'types' => EquipmentType::orderBy('name')->get(),
-            'models' => EquipmentModel::with('brand', 'type')
+            'models' => EquipmentModel::with('brand', 'type', 'chunks')
                 ->latest()
                 ->paginate(20)
                 ->appends(['tab' => 'models']),
@@ -147,5 +147,23 @@ class EquipmentController extends Controller
     {
         $model->delete();
         return Redirect::back()->with('success', 'Model deleted.');
+    }
+
+    public function storeChunk(Request $request, EquipmentModel $model)
+    {
+        $validated = $request->validate([
+            'topic' => 'required|string|max:255',
+            'content' => 'required|string',
+        ]);
+
+        $model->chunks()->create($validated);
+
+        return Redirect::back()->with('success', 'Documentation chunk added.');
+    }
+
+    public function destroyChunk(\App\Models\DocumentationChunk $chunk)
+    {
+        $chunk->delete();
+        return Redirect::back()->with('success', 'Chunk deleted.');
     }
 }

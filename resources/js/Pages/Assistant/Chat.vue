@@ -51,7 +51,7 @@ const sendMessage = async () => {
         messages.value.push({ role: 'assistant', content: response.data.reply });
     } catch (error) {
         console.error(error);
-        messages.value.push({ role: 'assistant', content: 'Sorry, I encountered an error. Please try again.' });
+        messages.value.push({ role: 'assistant', content: 'Lo siento, ocurrió un error. Por favor intenta de nuevo.' });
     } finally {
         loading.value = false;
         await scrollToBottom();
@@ -62,7 +62,7 @@ const sendMessage = async () => {
 onMounted(() => {
     messages.value.push({ 
         role: 'assistant', 
-        content: `Hello! I am your ${props.model.name}. How can I help you regarding my features today?` 
+        content: `¡Hola! Soy tu ${props.model.name}. ¿En qué puedo ayudarte con respecto a mis funciones hoy?` 
     });
 });
 </script>
@@ -139,7 +139,7 @@ onMounted(() => {
                     <TextInput 
                         v-model="userInput" 
                         class="flex-1" 
-                        :placeholder="provider ? 'Ask a question about this equipment...' : 'AI Assistant is currently disabled.'"
+                        :placeholder="provider ? 'Haz una pregunta sobre este equipo...' : 'El asistente IA está desactivado actualmente.'"
                         :disabled="loading || !provider"
                     />
                     <PrimaryButton 

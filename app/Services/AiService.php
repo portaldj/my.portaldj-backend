@@ -15,7 +15,7 @@ class AiService
      * @param string $userMessage The user's question
      * @return string|null The AI response or null on failure
      */
-    public function chat(string $provider, string $systemPrompt, string $userMessage, ?\App\Models\User $user = null): ?string
+    public function chat(string $provider, string $systemPrompt, string $userMessage, ?\App\Models\User $user = null, float $temperature = 0.7): ?string
     {
         // Check Global Settings
         $settingKey = $provider . '_enabled';
@@ -28,15 +28,15 @@ class AiService
         }
 
         if ($provider === 'openai') {
-            return $this->chatOpenAi($systemPrompt, $userMessage, $user);
+            return $this->chatOpenAi($systemPrompt, $userMessage, $user, $temperature);
         } elseif ($provider === 'gemini') {
-            return $this->chatGemini($systemPrompt, $userMessage, $user);
+            return $this->chatGemini($systemPrompt, $userMessage, $user, $temperature);
         }
 
         return null;
     }
 
-    protected function chatOpenAi(string $systemPrompt, string $userMessage, ?\App\Models\User $user = null): ?string
+    protected function chatOpenAi(string $systemPrompt, string $userMessage, ?\App\Models\User $user = null, float $temperature = 0.7): ?string
     {
         $apiKey = ($user && $user->openai_key) ? $user->openai_key : config('services.openai.api_key');
 
@@ -53,7 +53,7 @@ class AiService
                         ['role' => 'system', 'content' => $systemPrompt],
                         ['role' => 'user', 'content' => $userMessage],
                     ],
-                    'temperature' => 0.7,
+                    'temperature' => $temperature,
                 ]);
 
             if ($response->successful()) {
@@ -68,7 +68,7 @@ class AiService
         }
     }
 
-    protected function chatGemini(string $systemPrompt, string $userMessage, ?\App\Models\User $user = null): ?string
+    protected function chatGemini(string $systemPrompt, string $userMessage, ?\App\Models\User $user = null, float $temperature = 0.7): ?string
     {
         // Use user key if available, otherwise fallback
         $apiKey = ($user && $user->gemini_key) ? $user->gemini_key : config('services.gemini.api_key');
@@ -85,6 +85,8 @@ class AiService
 
         try {
             $model = config('services.gemini.model', 'gemini-1.5-flash');
+            // Ensure no extra prefixes in config, or handle them.
+            // Documentation says: https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent
             $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}";
 
             // Constructing a structured prompt
