@@ -69,6 +69,8 @@ class AssistantController extends Controller
 
         return Inertia::render('Assistant/Chat', [
             'model' => $model->load('brand', 'type'),
+            'openai_enabled' => \App\Models\Setting::where('key', 'openai_enabled')->value('value') ?? '1',
+            'gemini_enabled' => \App\Models\Setting::where('key', 'gemini_enabled')->value('value') ?? '1',
         ]);
     }
 

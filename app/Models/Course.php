@@ -18,9 +18,15 @@ class Course extends Model
 
     public function getThumbnailUrlAttribute()
     {
-        return $this->thumbnail_path
-            ? '/storage/' . $this->thumbnail_path
-            : null;
+        if (!$this->thumbnail_path)
+            return null;
+
+        // Check Local
+        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($this->thumbnail_path)) {
+            return '/storage/' . $this->thumbnail_path;
+        }
+
+        return \Illuminate\Support\Facades\Storage::disk('r2-public')->url($this->thumbnail_path);
     }
 
     public function getThumbUrlAttribute()
@@ -28,20 +34,15 @@ class Course extends Model
         if (!$this->thumbnail_path)
             return null;
 
-        // Logic to handle if stored path is "optimized" or "original"
-        // We will standardize on storing ORIGINAL.
-        // But if we encounter a file like "hash_optimized.jpg" (legacy from 2 mins ago),
-        // pathinfo works: filename="hash_optimized".
-        // variant path becomes "hash_optimized_thumb.jpg". This is WRONG.
-        // We need to strip known suffixes if we want robust handling, or just fix the Controller.
-        // Fixing the Controller is better. Accessor assumes stored path is base/original.
-
         $info = pathinfo($this->thumbnail_path);
         $path = $info['dirname'] . '/' . $info['filename'] . '_thumb.' . $info['extension'];
 
-        return \Illuminate\Support\Facades\Storage::disk('public')->exists($path)
-            ? '/storage/' . $path
-            : $this->thumbnail_url;
+        // Check Local
+        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
+            return '/storage/' . $path;
+        }
+
+        return \Illuminate\Support\Facades\Storage::disk('r2-public')->url($path);
     }
 
     public function getOptimizedUrlAttribute()
@@ -52,9 +53,12 @@ class Course extends Model
         $info = pathinfo($this->thumbnail_path);
         $path = $info['dirname'] . '/' . $info['filename'] . '_optimized.' . $info['extension'];
 
-        return \Illuminate\Support\Facades\Storage::disk('public')->exists($path)
-            ? '/storage/' . $path
-            : $this->thumbnail_url;
+        // Check Local
+        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
+            return '/storage/' . $path;
+        }
+
+        return \Illuminate\Support\Facades\Storage::disk('r2-public')->url($path);
     }
 
     protected $appends = ['thumbnail_url', 'thumb_url', 'optimized_url'];

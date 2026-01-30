@@ -53,24 +53,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ]);
         })->name('pool');
 
-        Route::get('/pool/download/{song}', function ($songId, App\Services\PoolService $poolService) {
-            try {
-                $song = $poolService->downloadSong(request()->user(), $songId);
+        Route::get('/pool/preview/{song}', [\App\Http\Controllers\SongDownloadController::class, 'preview'])->name('pool.preview');
 
-                $path = \Illuminate\Support\Facades\Storage::disk('public')->path($song->file_path);
-
-                // Get extension from original file
-                $extension = pathinfo($song->file_path, PATHINFO_EXTENSION);
-                $filename = $song->track_name . '.' . $extension;
-
-                // Sanitize filename
-                $filename = preg_replace('/[^a-zA-Z0-9\-\_\.]/', '_', $filename);
-
-                return response()->download($path, $filename);
-            } catch (\Exception $e) {
-                return back()->with('error', $e->getMessage());
-            }
-        })->name('pool.download');
+        Route::get('/pool/download/{song}', [\App\Http\Controllers\SongDownloadController::class, 'download'])->name('pool.download');
     });
 
     Route::middleware(['module:academy'])->group(function () {

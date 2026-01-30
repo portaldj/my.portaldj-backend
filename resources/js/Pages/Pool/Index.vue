@@ -130,7 +130,7 @@ const formatDate = (dateString) => {
                             <!-- Prefer preview file, fallback to main file -->
                             <audio 
                                 ref="audioPlayer" 
-                                :src="currentSong.preview_file_path ? `/storage/${currentSong.preview_file_path}` : (currentSong.file_path ? `/storage/${currentSong.file_path}` : '#')" 
+                                :src="currentSong.preview_file_path ? route('pool.preview', currentSong.id) : (currentSong.file_path ? route('pool.download', currentSong.id) : '#')" 
                                 controls 
                                 autoplay 
                                 class="w-1/2"

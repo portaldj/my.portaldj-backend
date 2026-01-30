@@ -42,7 +42,7 @@ class ImageOptimizationService
 
         // Save original
         $originalPath = "{$path}/{$filename}";
-        Storage::disk('public')->put($originalPath, (string) $encoded);
+        Storage::disk('r2-public')->put($originalPath, (string) $encoded);
         $paths['original'] = $originalPath;
 
         // 2. Process Variants
@@ -69,7 +69,7 @@ class ImageOptimizationService
             }
 
             $variantEncoded = $variantImage->toJpeg(quality: 80);
-            Storage::disk('public')->put($variantPath, (string) $variantEncoded);
+            Storage::disk('r2-public')->put($variantPath, (string) $variantEncoded);
 
             $paths[$key] = $variantPath;
         }
@@ -83,8 +83,8 @@ class ImageOptimizationService
      */
     public function delete(string $originalPath, array $variantKeys = [])
     {
-        if (Storage::disk('public')->exists($originalPath)) {
-            Storage::disk('public')->delete($originalPath);
+        if (Storage::disk('r2-public')->exists($originalPath)) {
+            Storage::disk('r2-public')->delete($originalPath);
         }
 
         // Try access variants
@@ -98,8 +98,8 @@ class ImageOptimizationService
 
         foreach ($variantKeys as $key) {
             $variantPath = "{$dirname}/{$filename}_{$key}.jpg";
-            if (Storage::disk('public')->exists($variantPath)) {
-                Storage::disk('public')->delete($variantPath);
+            if (Storage::disk('r2-public')->exists($variantPath)) {
+                Storage::disk('r2-public')->delete($variantPath);
             }
         }
     }

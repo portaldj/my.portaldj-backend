@@ -8,12 +8,18 @@ import PrimaryButton from '@/Components/PrimaryButton.vue';
 
 const props = defineProps({
     model: Object,
+    openai_enabled: String,
+    gemini_enabled: String,
 });
 
 const messages = ref([]);
 const userInput = ref('');
 const loading = ref(false);
-const provider = ref('openai'); // Default to OpenAI
+
+// Determine default provider
+const defaultProvider = props.openai_enabled === '1' ? 'openai' : (props.gemini_enabled === '1' ? 'gemini' : null);
+const provider = ref(defaultProvider); 
+
 const chatContainer = ref(null);
 
 const scrollToBottom = async () => {
@@ -72,8 +78,9 @@ onMounted(() => {
                 </h2>
                 
                 <!-- Provider Selector -->
-                <div class="flex items-center space-x-2 bg-white dark:bg-gray-800 p-1 rounded-lg border border-gray-200 dark:border-gray-700">
+                <div v-if="openai_enabled === '1' || gemini_enabled === '1'" class="flex items-center space-x-2 bg-white dark:bg-gray-800 p-1 rounded-lg border border-gray-200 dark:border-gray-700">
                     <button 
+                        v-if="openai_enabled === '1'"
                         @click="provider = 'openai'"
                         class="px-3 py-1 text-xs font-medium rounded transition-colors"
                         :class="provider === 'openai' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'"
@@ -81,12 +88,16 @@ onMounted(() => {
                         OpenAI
                     </button>
                     <button 
+                        v-if="gemini_enabled === '1'"
                         @click="provider = 'gemini'"
                         class="px-3 py-1 text-xs font-medium rounded transition-colors"
                         :class="provider === 'gemini' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'"
                     >
                         Gemini
                     </button>
+                </div>
+                <div v-else class="text-xs text-red-500 font-bold bg-red-100 dark:bg-red-900/30 px-3 py-1 rounded">
+                    AI Disabled
                 </div>
             </div>
         </template>
@@ -128,17 +139,17 @@ onMounted(() => {
                     <TextInput 
                         v-model="userInput" 
                         class="flex-1" 
-                        placeholder="Ask a question about this equipment..." 
-                        :disabled="loading"
+                        :placeholder="provider ? 'Ask a question about this equipment...' : 'AI Assistant is currently disabled.'"
+                        :disabled="loading || !provider"
                     />
                     <PrimaryButton 
                         type="submit" 
-                        :disabled="loading || !userInput.trim()"
+                        :disabled="loading || !userInput.trim() || !provider"
                     >
                         Send
                     </PrimaryButton>
                 </form>
-                <p class="text-xs text-center text-gray-400 mt-2">
+                <p v-if="provider" class="text-xs text-center text-gray-400 mt-2">
                     AI response generated using {{ provider === 'openai' ? 'OpenAI GPT' : 'Google Gemini' }}. Check manual for safety.
                 </p>
             </div>

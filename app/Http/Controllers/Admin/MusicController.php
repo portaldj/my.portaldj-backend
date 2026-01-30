@@ -44,12 +44,15 @@ class MusicController extends Controller
         ]);
 
         if ($request->hasFile('file')) {
-            $path = $request->file('file')->store('songs', 'public');
+            $path = $request->file('file')->store('songs', 'r2-private');
+            if (!$path) {
+                throw new \Exception('Failed to upload file to R2 Private');
+            }
             $validated['file_path'] = $path;
         }
 
         if ($request->hasFile('preview_file')) {
-            $path = $request->file('preview_file')->store('songs/previews', 'public');
+            $path = $request->file('preview_file')->store('songs/previews', 'r2-private');
             $validated['preview_file_path'] = $path;
         }
 
@@ -85,22 +88,30 @@ class MusicController extends Controller
         ]);
 
         if ($request->hasFile('file')) {
-            // Delete old file
-            if ($song->file_path && Storage::disk('public')->exists($song->file_path)) {
-                Storage::disk('public')->delete($song->file_path);
+            // Delete old file (Check R2 then Public)
+            if ($song->file_path) {
+                if (Storage::disk('r2-private')->exists($song->file_path)) {
+                    Storage::disk('r2-private')->delete($song->file_path);
+                } elseif (Storage::disk('public')->exists($song->file_path)) {
+                    Storage::disk('public')->delete($song->file_path);
+                }
             }
-            // Upload new file
-            $path = $request->file('file')->store('songs', 'public');
+            // Upload new file to Private R2
+            $path = $request->file('file')->store('songs', 'r2-private');
             $validated['file_path'] = $path;
         }
 
         if ($request->hasFile('preview_file')) {
-            // Delete old preview
-            if ($song->preview_file_path && Storage::disk('public')->exists($song->preview_file_path)) {
-                Storage::disk('public')->delete($song->preview_file_path);
+            // Delete old preview (Check R2 then Public)
+            if ($song->preview_file_path) {
+                if (Storage::disk('r2-private')->exists($song->preview_file_path)) {
+                    Storage::disk('r2-private')->delete($song->preview_file_path);
+                } elseif (Storage::disk('public')->exists($song->preview_file_path)) {
+                    Storage::disk('public')->delete($song->preview_file_path);
+                }
             }
-            // Upload new preview
-            $path = $request->file('preview_file')->store('songs/previews', 'public');
+            // Upload new preview to Private R2
+            $path = $request->file('preview_file')->store('songs/previews', 'r2-private');
             $validated['preview_file_path'] = $path;
         }
 
@@ -112,8 +123,22 @@ class MusicController extends Controller
     public function destroy(Song $song)
     {
         // Delete file from storage
-        if ($song->file_path && Storage::disk('public')->exists($song->file_path)) {
-            Storage::disk('public')->delete($song->file_path);
+        // Delete file from storage (Check R2 then Public)
+        if ($song->file_path) {
+            if (Storage::disk('r2-private')->exists($song->file_path)) {
+                Storage::disk('r2-private')->delete($song->file_path);
+            } elseif (Storage::disk('public')->exists($song->file_path)) {
+                Storage::disk('public')->delete($song->file_path);
+            }
+        }
+
+        // Delete preview
+        if ($song->preview_file_path) {
+            if (Storage::disk('r2-private')->exists($song->preview_file_path)) {
+                Storage::disk('r2-private')->delete($song->preview_file_path);
+            } elseif (Storage::disk('public')->exists($song->preview_file_path)) {
+                Storage::disk('public')->delete($song->preview_file_path);
+            }
         }
 
         $song->delete();

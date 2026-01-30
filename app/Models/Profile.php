@@ -46,9 +46,16 @@ class Profile extends Model
 
     public function getProfileImageUrlAttribute()
     {
-        return $this->profile_image_path
-            ? '/storage/' . $this->profile_image_path
-            : null;
+        if (!$this->profile_image_path)
+            return null;
+
+        // Check Local (Legacy)
+        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($this->profile_image_path)) {
+            return '/storage/' . $this->profile_image_path;
+        }
+
+        // Return R2 Public URL
+        return \Illuminate\Support\Facades\Storage::disk('r2-public')->url($this->profile_image_path);
     }
 
     public function getThumbUrlAttribute()
@@ -58,9 +65,13 @@ class Profile extends Model
 
         $path = $this->getVariantPath($this->profile_image_path, 'thumb');
 
-        return \Illuminate\Support\Facades\Storage::disk('public')->exists($path)
-            ? '/storage/' . $path
-            : $this->profile_image_url;
+        // Check Local (Legacy)
+        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
+            return '/storage/' . $path;
+        }
+
+        // Return R2 Public URL (Assume variant exists or standard URL pattern)
+        return \Illuminate\Support\Facades\Storage::disk('r2-public')->url($path);
     }
 
     public function getMediumUrlAttribute()
@@ -70,9 +81,13 @@ class Profile extends Model
 
         $path = $this->getVariantPath($this->profile_image_path, 'medium');
 
-        return \Illuminate\Support\Facades\Storage::disk('public')->exists($path)
-            ? '/storage/' . $path
-            : $this->profile_image_url;
+        // Check Local (Legacy)
+        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
+            return '/storage/' . $path;
+        }
+
+        // Return R2 Public URL
+        return \Illuminate\Support\Facades\Storage::disk('r2-public')->url($path);
     }
 
     protected function getVariantPath($originalPath, $variant)

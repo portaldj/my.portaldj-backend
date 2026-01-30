@@ -17,6 +17,16 @@ class AiService
      */
     public function chat(string $provider, string $systemPrompt, string $userMessage, ?\App\Models\User $user = null): ?string
     {
+        // Check Global Settings
+        $settingKey = $provider . '_enabled';
+        // We can access setting model directly or cache.
+        // Assuming defaults are '1' (enabled) if missing.
+        $isEnabled = \App\Models\Setting::where('key', $settingKey)->value('value') ?? '1';
+
+        if ($isEnabled !== '1') {
+            return "Sorry, the " . ucfirst($provider) . " provider is currently disabled by the administrator.";
+        }
+
         if ($provider === 'openai') {
             return $this->chatOpenAi($systemPrompt, $userMessage, $user);
         } elseif ($provider === 'gemini') {
@@ -38,7 +48,7 @@ class AiService
         try {
             $response = Http::withToken($apiKey)
                 ->post('https://api.openai.com/v1/chat/completions', [
-                    'model' => 'gpt-3.5-turbo', // Cost-effective default
+                    'model' => config('services.openai.model', 'gpt-4o'), // Configurable model
                     'messages' => [
                         ['role' => 'system', 'content' => $systemPrompt],
                         ['role' => 'user', 'content' => $userMessage],
@@ -74,7 +84,8 @@ class AiService
         // Wait, standard gemini-pro endpoint:
 
         try {
-            $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key={$apiKey}";
+            $model = config('services.gemini.model', 'gemini-1.5-flash');
+            $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}";
 
             // Constructing a structured prompt
             $response = Http::post($url, [

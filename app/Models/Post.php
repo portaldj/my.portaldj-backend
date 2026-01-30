@@ -79,9 +79,15 @@ class Post extends Model
 
     public function getImageUrlAttribute()
     {
-        return $this->image_path
-            ? '/storage/' . $this->image_path
-            : null;
+        if (!$this->image_path)
+            return null;
+
+        // Check Local
+        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($this->image_path)) {
+            return '/storage/' . $this->image_path;
+        }
+
+        return \Illuminate\Support\Facades\Storage::disk('r2-public')->url($this->image_path);
     }
 
     public function getOptimizedUrlAttribute()
@@ -92,9 +98,12 @@ class Post extends Model
         $info = pathinfo($this->image_path);
         $path = $info['dirname'] . '/' . $info['filename'] . '_optimized.' . $info['extension'];
 
-        return \Illuminate\Support\Facades\Storage::disk('public')->exists($path)
-            ? '/storage/' . $path
-            : $this->image_url;
+        // Check Local
+        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
+            return '/storage/' . $path;
+        }
+
+        return \Illuminate\Support\Facades\Storage::disk('r2-public')->url($path);
     }
 
     protected $appends = ['tags', 'image_url', 'optimized_url'];

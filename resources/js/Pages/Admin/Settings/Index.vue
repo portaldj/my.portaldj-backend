@@ -20,6 +20,10 @@ const form = useForm({
         pool_is_pro: props.settings.pool_is_pro ?? '0',
         academy_is_pro: props.settings.academy_is_pro ?? '0',
         assistant_is_pro: props.settings.assistant_is_pro ?? '0',
+
+        // AI Provider Flags
+        openai_enabled: props.settings.openai_enabled ?? '1',
+        gemini_enabled: props.settings.gemini_enabled ?? '1',
     }
 });
 
@@ -129,6 +133,26 @@ const modules = [
                                         class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer transition-transform duration-200 ease-in-out transform checked:translate-x-full checked:border-yellow-500"
                                     />
                                     <label :for="mod.proKey" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-600 cursor-pointer transition-colors duration-200 ease-in-out" :class="{'bg-yellow-500/50': form.settings[mod.proKey] == '1'}"></label>
+                                </div>
+                            </div>
+
+                            <!-- Specific AI Provider Toggles (Only show if Assistant is enabled) -->
+                            <div v-if="mod.key === 'module_assistant' && form.settings.module_assistant == '1'" class="mt-4 pt-4 border-t border-gray-600 pl-4 space-y-4">
+                                <!-- OpenAI Toggle -->
+                                <div class="flex items-center justify-between">
+                                    <label for="openai_enabled" class="text-sm font-medium text-gray-300">Enable OpenAI (ChatGPT)</label>
+                                    <div class="relative inline-block w-10 align-middle select-none transition duration-200 ease-in">
+                                        <input type="checkbox" name="openai_enabled" id="openai_enabled" v-model="form.settings.openai_enabled" true-value="1" false-value="0" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer transition-transform duration-200 ease-in-out transform checked:translate-x-full checked:border-green-500"/>
+                                        <label for="openai_enabled" class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-600 cursor-pointer transition-colors duration-200 ease-in-out" :class="{'bg-green-500/50': form.settings.openai_enabled == '1'}"></label>
+                                    </div>
+                                </div>
+                                <!-- Gemini Toggle -->
+                                <div class="flex items-center justify-between">
+                                    <label for="gemini_enabled" class="text-sm font-medium text-gray-300">Enable Google Gemini</label>
+                                    <div class="relative inline-block w-10 align-middle select-none transition duration-200 ease-in">
+                                        <input type="checkbox" name="gemini_enabled" id="gemini_enabled" v-model="form.settings.gemini_enabled" true-value="1" false-value="0" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer transition-transform duration-200 ease-in-out transform checked:translate-x-full checked:border-blue-500"/>
+                                        <label for="gemini_enabled" class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-600 cursor-pointer transition-colors duration-200 ease-in-out" :class="{'bg-blue-500/50': form.settings.gemini_enabled == '1'}"></label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
